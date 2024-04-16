@@ -112,6 +112,23 @@ console.log("Dropdown clicked");
 Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
 }
 
+function setupJourneySubscriptions() {
+    // Subscribe to readiness
+    Genesys("subscribe", "Journey.ready", function() {
+      console.log("GPE Journey plugin is ready.")
+    });
+
+    // Subscribe to open actions
+    Genesys("subscribe", "Journey.qualifiedOpenAction", function(event) {
+        console.log("Received GPE qualified open action event:", event);
+
+        if (event.data.openActionProperties.openActionName.startsWith("GPE and SF - ")) {
+            console.log("Triggering Salesforce Web Messaging...");
+            launchSalesforceChat();
+        }
+    });
+}
+
 
 var username='';
 console.log('Email address is ',this.username);
@@ -127,3 +144,7 @@ Genesys("command", "Database.set", {
                }
          }
   });
+
+document.addEventListener('DOMContentLoaded', function(event) {
+    setupJourneySubscriptions();
+});
