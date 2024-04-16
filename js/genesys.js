@@ -57,6 +57,53 @@ function checkCookie() {
   }
 }
 
+function setupJourneyTracking() {
+    // Track all page views
+    Genesys("command", "Journey.pageview", {});
+
+    // Track forms
+    Genesys("command", "Journey.formsTrack", {
+        selector: "form",
+        captureFormDataOnAbandon: true
+    });
+
+    // Track click events on all buttons
+    Genesys("command", "Journey.trackClickEvents", {
+        clickEvents: [
+            { selector: "button.btn", eventName: "button_click" }
+        ]
+    });
+
+    // Track idle events
+    Genesys("command", "Journey.trackIdleEvents", {
+        idleEvents: [{ idleAfterSeconds: 60, eventName: "user_idle_60_seconds" }]
+    });
+}
+
+function FormTrack() {
+    console.log("Form track");
+    Genesys("command", "Journey.formsTrack", {
+        selector: "form",
+        captureFormDataOnAbandon: true
+    });
+}
+
+function ButtonClickTrack() {
+    console.log("Button click track");
+    Genesys("command", "Journey.trackClickEvents", {
+        clickEvents: [
+            { selector: "button.btn", eventName: "button_click" }
+        ]
+    });
+}
+
+function IdleTrack() {
+    console.log("Idle 120 seconds track");
+    Genesys("command", "Journey.trackIdleEvents", {
+        idleEvents: [{ idleAfterSeconds: 120, eventName: "user_idle_120_seconds" }]
+    });
+}
+
 function CardSelect() {
 console.log("Dropdown clicked");
 Genesys("command", "Journey.record", { eventName: "credit_card_selection" });
@@ -147,4 +194,7 @@ Genesys("command", "Database.set", {
 
 document.addEventListener('DOMContentLoaded', function(event) {
     setupJourneySubscriptions();
+    //FormTrack();
+    //ButtonClickTrack();
+    //IdleTrack();	
 });
