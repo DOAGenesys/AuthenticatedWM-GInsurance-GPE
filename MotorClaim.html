@@ -395,8 +395,52 @@
       ><i class="bi bi-arrow-up"></i
     ></a>
 
-
-  </body>
+	<script>
+		
+        function getConfig() {
+                return fetch('/api/getConfig')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Environment vars could not be retrieved');
+                        }
+                        return response.json();
+                    });
+            }
+        
+        function setWindowConfig(config) {
+            Object.keys(config).forEach(key => {
+                window[key] = config[key];
+                console.log(`window.${key} =`, window[key]);
+            });
+        }
+		
+	async function loadScript(url) {
+	    return new Promise((resolve, reject) => {
+	        const script = document.createElement('script');
+	        script.src = url;
+	        script.onload = resolve;
+	        script.onerror = reject;
+	        document.head.appendChild(script);
+	    });
+	}
+	
+	async function start() {
+	    try {
+	        await getConfig();
+	        const config = await getConfig();
+	        setWindowConfig(config);
+	        await loadScript('js/GCsnippet.js');
+	        await loadScript('js/SFsnippet.js');
+	        await loadScript('js/main.js');
+	    } catch (error) {
+	        console.error("Error loading scripts: ", error);
+	    }
+	}
+	
+	start();
+	</script>
+	  	  
+</body>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -406,10 +450,5 @@
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="lib/counterup/counterup.min.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
-    <script src="js/GCsnippet.js"></script>
-    <script src="js/SFsnippet.js"></script>
 
 </html>
