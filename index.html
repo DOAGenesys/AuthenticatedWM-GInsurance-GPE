@@ -971,8 +971,34 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
       ><i class="bi bi-arrow-up"></i
     ></a>
 
+    <script>
+        function getConfig() {
+                return fetch('/api/getConfig')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Environment vars could not be retrieved');
+                        }
+                        return response.json();
+                    });
+            }
+        
+        function setWindowConfig(config) {
+            Object.keys(config).forEach(key => {
+                window[key] = config[key];
+                console.log(`window.${key} =`, window[key]);
+            });
+        }
 
-  </body>
+            async function start() {
+                try {
+                    await getConfig()
+                    const config = await getConfig();
+                    setWindowConfig(config);
+            }
+
+            start();
+    </script>
+</body>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
