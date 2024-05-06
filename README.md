@@ -27,7 +27,7 @@ For more information on configuring Salesforce Web Messaging, refer to the [offi
 ### Genesys Cloud Setup
 
 1. Configure a Genesys Cloud Web Messaging deployment, required for predictive engagement.
-2. Define your Segment Conditions in the Genesys Cloud UI as follows:
+2. Define your Segment Conditions in the Genesys Cloud Predictive Engagement admin UI as follows:
    - **Event Source:** Web
    - **Event:** Form abandoned
    - **Page domain:** contains any of your specified domains, e.g., `vercel.app`
@@ -89,7 +89,7 @@ POST /api/v2/journey/actionmaps
 
 ### Web Application Setup
 
-1. Clone this GitHub repository to your local machine.
+1. Clone this GitHub repository to your github account.
 2. Create a Vercel account using your GitHub account and start a new project with the cloned repository.
 3. Set up the following environment variables before deploying:
    - **SF_WM_URL:** URL from SF WM generated code snippet (e.g., `https://<mydomain>.my.site.com/ESWSalesforcewebmessagi1712838660793`)
@@ -105,3 +105,7 @@ POST /api/v2/journey/actionmaps
 2. Navigate to your Vercel website and access the "Appointment" section.
 3. Interact with the form by filling out the first field but not completing it, then navigate to another section.
 4. Observe the Salesforce Web Messaging widget; it should be triggered shortly after the specified conditions are met.
+
+## Debug
+
+1. Open the browser developer console and filter by "snippet.js" to see debugging for both GC and SF code snippets
