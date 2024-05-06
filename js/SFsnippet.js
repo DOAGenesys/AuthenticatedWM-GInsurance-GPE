@@ -4,7 +4,8 @@ function initEmbeddedMessaging() {
         embeddedservice_bootstrap.settings.language = 'en-US';
         embeddedservice_bootstrap.settings.hideChatButtonOnLoad = true;
 
-        var calculatedScrt2URL = window.SFWMURL.replace('develop.my.site.com', 'develop.my.salesforce-scrt.com');
+        var baseDomainURL = new URL(window.SFWMURL);
+        var calculatedScrt2URL = baseDomainURL.origin.replace('develop.my.site.com', 'develop.my.salesforce-scrt.com');
 
         console.log("SFsnippet.js - Salesforce Org ID:", window.SFOrgId);
         console.log("SFsnippet.js - Salesforce Web Messaging Name:", window.SFWMName);
