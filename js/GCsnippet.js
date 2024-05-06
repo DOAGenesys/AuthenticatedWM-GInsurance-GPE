@@ -173,9 +173,7 @@ Genesys("command", "Database.set", {
          }
   });
 
-document.addEventListener('DOMContentLoaded', function(event) {
-    setupJourneySubscriptions();
-    FormTrack();
-    ButtonClickTrack();
-    IdleTrack();	
-});
+setupJourneySubscriptions();
+FormTrack();
+ButtonClickTrack();
+IdleTrack();
