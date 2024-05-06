@@ -1,18 +1,32 @@
-/**
-* Genesys Digtal: GPE
-*/
-
 (function (g, e, n, es, ys) {
-  g['_genesysJs'] = e;
-  g[e] = g[e] || function () {
-    (g[e].q = g[e].q || []).push(arguments)
-  };
-  g[e].t = 1 * new Date();
-  g[e].c = es;
-  ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
-})(window, 'Genesys', 'https://apps.mypurecloud.de/genesys-bootstrap/genesys.min.js', {
-  environment: 'prod-euc1',
-  deploymentId: '822d3028-017c-4818-a9e5-d806df4e6c88'
+    console.log('GCsnippet.js - Execution started.');
+    g['_genesysJs'] = e;
+    g[e] = g[e] || function () {
+        (g[e].q = g[e].q || []).push(arguments);
+    };
+    g[e].t = 1 * new Date();
+    g[e].c = es;
+    ys = document.createElement('script');
+    ys.async = 1;
+    ys.src = n;
+    ys.charset = 'utf-8';
+    ys.onload = function() {
+        console.log('GCsnippet.js - Script loaded successfully.');
+        g[e]("subscribe", "Journey.ready", function() {
+            setupJourneyTracking();
+        });
+    };
+    ys.onerror = function() {
+        console.error('GCsnippet.js - Error loading script.');
+    };
+    document.head.appendChild(ys);
+})(window, 'Genesys', window.GCDomain + '/genesys-bootstrap/genesys.min.js', {
+    environment: window.GCEnvironment,
+    deploymentId: window.GCMessagingDeplId
+});
+
+document.addEventListener('DOMContentLoaded', function(event) {
+    setupJourneySubscriptions();
 });
 
 function setCookie(cname,cvalue,exdays) {
