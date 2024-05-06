@@ -159,18 +159,16 @@ function setupJourneySubscriptions() {
     });
 }
 
-
-var username='';
-console.log('GCsnippet.js - Email address is ',this.username);
+console.log('GCsnippet.js - Customer email address is ', window.customerEmail);
 username=getCookie("username");
-console.log('GCsnippet.js - Email address is ',this.username);
+console.log('GCsnippet.js - Cookie customer email address is ',this.username);
 Genesys("command", "Database.set", {
     messaging: {
         customAttributes: {
-                 ID: username,
-                       browser_language: navigator.language,
-                       vertical: "insurance",
-					  language: "english"
+                ID: username,
+                browser_language: navigator.language,
+                vertical: "insurance",
+		language: "english"
                }
          }
   });
