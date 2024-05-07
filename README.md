@@ -1,6 +1,6 @@
 # Genesys Cloud Predictive Engagement and Salesforce Web Messaging Integration
 
-This repository contains the code and configuration necessary to integrate Genesys Cloud Predictive Engagement (GC PE) with Salesforce Web Messaging (SF WM), providing a cohesive customer engagement solution that tracks user activities on a website and initiates conversations via Salesforce Web Messaging based on predefined conditions.
+This repository contains the code and configuration guidance necessary to integrate Genesys Cloud Predictive Engagement (GPE) with Salesforce Web Messaging (SF WM), providing a cohesive customer engagement solution that tracks user activities on a website and initiates conversations via Salesforce Web Messaging based on predictive GPE capabilities.
 
 ## Overview
 
