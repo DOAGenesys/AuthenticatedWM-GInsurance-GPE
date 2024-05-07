@@ -38,7 +38,7 @@ Use the API endpoints provided by Genesys Cloud to set up open actions. Below ar
 
 #### Create Open Action (the URLs can be arbitrary)
 
-\```http
+```http
 POST /api/v2/journey/openactions
 
 {
@@ -61,11 +61,11 @@ POST /api/v2/journey/openactions
   },
   "createdDate": "2024-04-16T07:26:18.813Z"
 }
-\```
+```
 
 #### Create Action Map Triggering the Open Action
 
-\```http
+```http
 POST /api/v2/journey/actionmaps
 
 {
@@ -85,7 +85,7 @@ POST /api/v2/journey/actionmaps
     }
   }
 }
-\```
+```
 
 ### Web Application Setup
 
