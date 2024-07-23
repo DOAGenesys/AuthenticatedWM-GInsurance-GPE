@@ -7,9 +7,9 @@
     <script>
         // Preserve all query parameters when redirecting
         var currentUrl = window.location.href;
-        var indexOfParams = currentUrl.indexOf('auth-callback?');
+        var indexOfParams = currentUrl.indexOf('?');
         if (indexOfParams !== -1) {
-            var params = currentUrl.slice(indexOfParams + 'auth-callback?'.length);
+            var params = currentUrl.slice(indexOfParams + 1); // Extract everything after '?'
             window.location.href = '/index.html?' + params;
         } else {
             window.location.href = '/index.html';
