@@ -44,8 +44,11 @@ window.GCMessenger = {
 // Add the AuthProvider plugin configuration
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     AuthProvider.registerCommand('getAuthCode', (e) => {
-        // Resolve with the authCode obtained from Google Authentication
+        // Retrieve the authCode from localStorage
         const authCode = localStorage.getItem('authCode');
+        console.log('AuthProvider.getAuthCode - Retrieved authCode:', authCode); // Log the authCode
+        
+        // Resolve with the authCode obtained from Google Authentication
         e.resolve({
             authCode: authCode,
             redirectUri: window.location.origin + '/auth-callback',
