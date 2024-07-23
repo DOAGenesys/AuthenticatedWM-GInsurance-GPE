@@ -990,7 +990,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
             
             console.log("Google Cloud configuration verified.");
 
-            // Added logs to check GCDomain, GCEnvironment, and GCMessagingDeplId
             console.log("GCDomain:", config.GCDomain);
             console.log("GCEnvironment:", config.GCEnvironment);
             console.log("GCMessagingDeplId:", config.GCMessagingDeplId);
@@ -1017,6 +1016,7 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 
             if (code && state) {
                 console.log("Auth callback detected. Processing...");
+                await loadGCsnippet(); // Wait for GCsnippet to load
                 try {
                     const message = await handleAuthCallback();
                     console.log("Auth callback processed:", message);
@@ -1048,7 +1048,24 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
             spinner.classList.remove('show');
         }
     }
-    
+
+    function loadGCsnippet() {
+        return new Promise((resolve, reject) => {
+            console.log("Loading GCsnippet.js...");
+            const script = document.createElement('script');
+            script.src = "js/GCsnippet.js";
+            script.onload = () => {
+                console.log("GCsnippet.js script loaded successfully.");
+                resolve();
+            };
+            script.onerror = () => {
+                console.error("Failed to load GCsnippet.js script.");
+                reject(new Error("Failed to load GCsnippet.js script."));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
     function initializeAuth() {
         console.log("Initializing auth...");
         const loginButton = document.getElementById('loginButton');
@@ -1119,18 +1136,7 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
     }
 
     console.log("Script loaded. Starting initialization...");
-    start().then(() => {
-        console.log("Start function completed. Now loading Genesys script.");
-        const script = document.createElement('script');
-        script.src = "js/GCsnippet.js";
-        script.onload = () => {
-            console.log("GCsnippet.js script loaded successfully.");
-        };
-        script.onerror = () => {
-            console.error("Failed to load GCsnippet.js script.");
-        };
-        document.head.appendChild(script);
-    }).catch(error => {
+    start().catch(error => {
         console.error("Failed to complete start function:", error);
     });
 </script>
