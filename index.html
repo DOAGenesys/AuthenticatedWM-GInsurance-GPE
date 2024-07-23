@@ -976,7 +976,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	    function setWindowConfig(config) {
 	        Object.keys(config).forEach(key => {
 	            window[key] = config[key];
-	            console.log(`window.${key} =`, window[key]);
 	        });
 	    }
 	
@@ -1000,13 +999,19 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	            initializeAuth();
 	            console.log("Auth initialized");
 	
-	            // Handle auth callback if on the callback page
-	            if (window.location.pathname === '/auth-callback') {
+	            // Check if this is an auth callback
+	            const urlParams = new URLSearchParams(window.location.search);
+	            const code = urlParams.get('code');
+	            const state = urlParams.get('state');
+	
+	            if (code && state) {
 	                try {
 	                    const message = await handleAuthCallback();
 	                    console.log(message);
-	                    // Redirect to main page or update UI
-	                    window.location.href = '/'; // Redirect to home page after successful auth
+	                    // Update UI to reflect signed-in state
+	                    updateAuthUI(true);
+	                    // Remove the query parameters from the URL
+	                    window.history.replaceState({}, document.title, window.location.pathname);
 	                } catch (error) {
 	                    console.error("Auth callback error:", error);
 	                    // Display error to user
