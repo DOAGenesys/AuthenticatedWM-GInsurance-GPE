@@ -22,13 +22,13 @@
 
 //authenticated messaging functions
 
-function setAuthToken(token) {
+export function setAuthToken(token) {
     Genesys("command", "Messenger.setAuthToken", { 
         authToken: token
     });
 }
 
-function clearAuthToken() {
+export function clearAuthToken() {
     Genesys("command", "Messenger.clearAuthToken");
 }
 
