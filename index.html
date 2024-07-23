@@ -965,7 +965,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	                throw new Error(`HTTP error! status: ${response.status}`);
 	            }
 	            const config = await response.json();
-	            console.log("Fetched config:", config);
 	            return config;
 	        } catch (error) {
 	            console.error("Error fetching config:", error);
@@ -983,7 +982,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	        try {
 	            console.log("Fetching configuration...");
 	            const config = await getConfig();
-	            console.log("Configuration fetched:", config);
 	            
 	            setWindowConfig(config);
 	            
