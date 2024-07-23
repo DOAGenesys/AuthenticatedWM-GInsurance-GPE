@@ -5,6 +5,7 @@ module.exports = (req, res) => {
         GCMessagingDeplId: process.env.GC_MESSAGING_DEPLOYMENT_ID,
         GoogleCloudApiKey: process.env.GOOGLE_API_KEY,
         GoogleCloudAuthDomain: process.env.GOOGLE_AUTH_DOMAIN,
+        GoogleOIDCId: process.env.GOOGLE_OIDC_ID,
         customerEmail: process.env.CUSTOMER_EMAIL
     });
 };
