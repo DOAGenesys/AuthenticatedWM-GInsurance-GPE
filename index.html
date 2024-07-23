@@ -991,6 +991,17 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
                 }
                 
                 console.log("Google Cloud configuration verified.");
+
+                if (!window.GCDomain) {
+                    throw new Error("GC Domain is not set");
+                }
+                if (!window.GCEnvironment) {
+                    throw new Error("GC Environment is not set");
+                }
+                if (!window.GCMessagingDeplId) {
+                    throw new Error("GC Deployment Id is not set");
+                }
+                console.log("GC configuration verified.");
                 
                 console.log("Initializing auth...");
                 initializeAuth();
