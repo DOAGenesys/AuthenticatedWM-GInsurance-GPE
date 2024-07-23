@@ -30,7 +30,11 @@ export async function handleAuthCallback() {
         // Store the authorization code and ID token for Genesys Cloud
         localStorage.setItem('authCode', code);
         console.log('GoogleAuthService - Storing authCode:', code);
-        window.registerAuthProvider(); // Register AuthProvider after storing authCode
+        if (typeof window.registerAuthProvider === 'function') {
+            window.registerAuthProvider(); // Register AuthProvider after storing authCode
+        } else {
+            console.error("GoogleAuthService - registerAuthProvider function is not available");
+        }
         window.GCMessenger.setAuthToken(idToken);
 
         return "Signed in successfully!";
@@ -62,10 +66,7 @@ async function fetchTokens(code) {
 }
 
 export async function signOutUser() {
-    // Clear the auth token from Genesys Cloud
     window.GCMessenger.clearAuthToken();
-    // Optionally, redirect to Google's logout URL
-    // window.location.href = 'https://accounts.google.com/logout';
     return "Signed out successfully!";
 }
 
