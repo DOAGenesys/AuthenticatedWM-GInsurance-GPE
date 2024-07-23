@@ -18,11 +18,15 @@ export async function handleAuthCallback() {
     const code = urlParams.get('code');
     const state = urlParams.get('state');
 
+    console.log('handleAuthCallback - URL Parameters:', { code, state });
+
     if (code && state) {
         // Verify state to prevent CSRF attacks
         if (state !== localStorage.getItem('oauth_state')) {
             throw new Error('Invalid state parameter');
         }
+
+        console.log('handleAuthCallback - Valid code and state received:', { code, state });
 
         const tokenResponse = await fetchTokens(code);
         const idToken = tokenResponse.id_token;
