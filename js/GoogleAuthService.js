@@ -28,6 +28,7 @@ export async function handleAuthCallback() {
         const idToken = tokenResponse.id_token;
 
         // Store the authorization code and ID token for Genesys Cloud
+        console.log('GoogleAuthService - Storing authCode:', code);
         localStorage.setItem('authCode', code);
         window.GCMessenger.setAuthToken(idToken);
 
