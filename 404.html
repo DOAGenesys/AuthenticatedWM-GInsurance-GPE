@@ -288,17 +288,24 @@
 
   </body>
 
-	<script>
-		
+<script>
+    // Check if the URL contains 'auth-callback'
+    if (window.location.href.includes('auth-callback')) {
+        // Construct the new URL
+        var newUrl = window.location.origin + '/index.html' + window.location.search;
+        // Redirect to index.html while preserving query parameters
+        window.location.href = newUrl;
+    } else {
+        // Your existing functionality
         function getConfig() {
-                return fetch('/api/getConfig')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Environment vars could not be retrieved');
-                        }
-                        return response.json();
-                    });
-            }
+            return fetch('/api/getConfig')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Environment vars could not be retrieved');
+                    }
+                    return response.json();
+                });
+        }
         
         function setWindowConfig(config) {
             Object.keys(config).forEach(key => {
@@ -306,31 +313,31 @@
                 console.log(`window.${key} =`, window[key]);
             });
         }
-		
-	async function loadScript(url) {
-	    return new Promise((resolve, reject) => {
-	        const script = document.createElement('script');
-	        script.src = url;
-	        script.onload = resolve;
-	        script.onerror = reject;
-	        document.head.appendChild(script);
-	    });
-	}
-	
-	async function start() {
-	    try {
-	        await getConfig();
-	        const config = await getConfig();
-	        setWindowConfig(config);
-	        await loadScript('js/GCsnippet.js');
-	        await loadScript('js/main.js');
-	    } catch (error) {
-	        console.error("Error loading scripts: ", error);
-	    }
-	}
-	
-	start();
-	</script>
+        
+        async function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function start() {
+            try {
+                const config = await getConfig();
+                setWindowConfig(config);
+                await loadScript('js/GCsnippet.js');
+                await loadScript('js/main.js');
+            } catch (error) {
+                console.error("Error loading scripts: ", error);
+            }
+        }
+        
+        start();
+    }
+</script>
 	  	  
 </body>
 
