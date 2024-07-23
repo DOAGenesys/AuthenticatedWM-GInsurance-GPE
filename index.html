@@ -970,7 +970,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
         function setWindowConfig(config) {
             Object.keys(config).forEach(key => {
                 window[key] = config[key];
-                console.log(`window.${key} =`, window[key]);
             });
         }
 
@@ -978,8 +977,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	    try {
 	        console.log("Start function initiated.");
 	        const config = await getConfig();
-	        
-	        console.log("Config fetched:", config);
 	        setWindowConfig(config);
 	        
 	        console.log("Configuration set. Verifying...");
