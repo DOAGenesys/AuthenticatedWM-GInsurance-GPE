@@ -1,8 +1,8 @@
 import { auth } from './firebase-config.js';
 import { signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { setAuthToken, clearAuthToken } from './genesys-messenger.js';
+import { setAuthToken, clearAuthToken } from './GCsnippet.js';
 
-const provider = new OAuthProvider("oidc.gcauthwebmessaging");
+const provider = new OAuthProvider(window.GoogleOIDCId);
 
 export function signIn() {
     return signInWithPopup(auth, provider)
