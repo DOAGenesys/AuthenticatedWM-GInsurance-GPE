@@ -984,56 +984,66 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
         console.log("Window configuration set complete.");
     }
 
-    async function start() {
-        try {
-            console.log("Start function initiated.");
-            const config = await getConfig();
-            
-            setWindowConfig(config);
-            
-            console.log("Configuration set. Verifying...");
-            
-            if (!window.GoogleCloudClientId) {
-                throw new Error("Google Cloud Client Id is not set");
-            }
-            if (!window.GoogleCloudClientSecret) {
-                throw new Error("Google Cloud Client Secret is not set");
-            }
-            
-            console.log("Google Cloud configuration verified.");
-            
-            console.log("Initializing auth...");
-            initializeAuth();
-            console.log("Auth initialized");
+	async function start() {
+	    try {
+	        console.log("Start function initiated.");
+	        const config = await getConfig();
+	        
+	        setWindowConfig(config);
+	        
+	        console.log("Configuration set. Verifying...");
+	        
+	        if (!window.GoogleCloudClientId) {
+	            throw new Error("Google Cloud Client Id is not set");
+	        }
+	        if (!window.GoogleCloudClientSecret) {
+	            throw new Error("Google Cloud Client Secret is not set");
+	        }
+	        
+	        console.log("Google Cloud configuration verified.");
+	        
+	        console.log("Initializing auth...");
+	        initializeAuth();
+	        console.log("Auth initialized");
+	
+	        // Check if this is an auth callback
+	        const urlParams = new URLSearchParams(window.location.search);
+	        const code = urlParams.get('code');
+	        const state = urlParams.get('state');
+	
+	        if (code && state) {
+	            console.log("Auth callback detected. Processing...");
+	            try {
+	                const message = await handleAuthCallback();
+	                console.log("Auth callback processed:", message);
+	                // Update UI to reflect signed-in state
+	                updateAuthUI(true);
+	                // Remove the query parameters from the URL
+	                window.history.replaceState({}, document.title, window.location.pathname);
+	            } catch (error) {
+	                console.error("Auth callback error:", error);
+	                // Display error to user
+	                alert("Authentication failed. Please try again.");
+	            }
+	        }
+	        console.log("Start function completed successfully.");
+	    } catch (error) {
+	        console.error("Error in start function:", error);
+	        console.error("Error details:", error.message);
+	        // Display error to user
+	        alert(`An error occurred during initialization: ${error.message}. Please check the console for more details.`);
+	    } finally {
+	        // Hide the spinner regardless of whether the initialization succeeded or failed
+	        hideSpinner();
+	    }
+	}
 
-            // Check if this is an auth callback
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-
-            if (code && state) {
-                console.log("Auth callback detected. Processing...");
-                try {
-                    const message = await handleAuthCallback();
-                    console.log("Auth callback processed:", message);
-                    // Update UI to reflect signed-in state
-                    updateAuthUI(true);
-                    // Remove the query parameters from the URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } catch (error) {
-                    console.error("Auth callback error:", error);
-                    // Display error to user
-                    alert("Authentication failed. Please try again.");
-                }
-            }
-            console.log("Start function completed successfully.");
-        } catch (error) {
-            console.error("Error in start function:", error);
-            console.error("Error details:", error.message);
-            // Display error to user
-            alert(`An error occurred during initialization: ${error.message}. Please check the console for more details.`);
-        }
-    }
+	function hideSpinner() {
+	    const spinner = document.getElementById('spinner');
+	    if (spinner) {
+	        spinner.classList.remove('show');
+	    }
+	}
     
     function initializeAuth() {
         console.log("Initializing auth...");
