@@ -1,83 +1,73 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { 
-    getAuth, 
-    signInWithRedirect, 
-    getRedirectResult, 
-    signOut, 
-    OAuthProvider, 
-    onAuthStateChanged,
-    browserPopupRedirectResolver
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-
-let auth;
-
-async function initializeAuth() {
-    if (typeof window.GoogleCloudApiKey === 'undefined' || typeof window.GoogleCloudAuthDomain === 'undefined') {
-        throw new Error('Firebase configuration is not set');
-    }
-    
-    const firebaseConfig = {
-        apiKey: window.GoogleCloudApiKey,
-        authDomain: window.GoogleCloudAuthDomain
-    };
-    console.log("Initializing Firebase with config:", firebaseConfig);
-    
-    const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-}
-
-const provider = new OAuthProvider(window.GoogleOIDCId);
+const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 export async function signIn() {
-    if (!auth) await initializeAuth();
-    try {
-        await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
-    } catch (error) {
-        console.error("Error initiating sign-in:", error);
-        throw new Error("Error initiating sign-in: " + error.message);
+    const params = new URLSearchParams({
+        client_id: window.GoogleCloudApiKey,
+        redirect_uri: window.location.origin + '/auth-callback',
+        response_type: 'code',
+        scope: 'openid email profile',
+        state: generateRandomState()
+    });
+
+    window.location.href = `${GOOGLE_AUTH_URL}?${params.toString()}`;
+}
+
+export async function handleAuthCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+
+    if (code && state) {
+        // Verify state to prevent CSRF attacks
+        if (state !== localStorage.getItem('oauth_state')) {
+            throw new Error('Invalid state parameter');
+        }
+
+        const tokenResponse = await fetchTokens(code);
+        const idToken = tokenResponse.id_token;
+
+        // Set the ID token for Genesys Cloud
+        window.GCMessenger.setAuthToken(idToken);
+
+        return "Signed in successfully!";
+    } else {
+        throw new Error('No code or state found in the URL');
     }
 }
 
-export async function handleRedirectResult() {
-    if (!auth) await initializeAuth();
-    return new Promise((resolve, reject) => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const result = await getRedirectResult(auth, browserPopupRedirectResolver);
-                    if (result) {
-                        const credential = OAuthProvider.credentialFromResult(result);
-                        const accessToken = credential.accessToken;
-                        window.GCMessenger.setAuthToken(accessToken);
-                        resolve("Signed in successfully!");
-                    } else {
-                        resolve(null); // User is signed in but not as a result of a redirect
-                    }
-                } catch (error) {
-                    console.error("Error handling redirect result:", error);
-                    reject(new Error("Error handling redirect result: " + error.message));
-                }
-            } else {
-                resolve(null); // User is not signed in
-            }
-        });
+async function fetchTokens(code) {
+    const response = await fetch(GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            code,
+            client_id: window.GoogleCloudApiKey,
+            client_secret: window.GoogleCloudClientSecret,
+            redirect_uri: window.location.origin + '/auth-callback',
+            grant_type: 'authorization_code',
+        }),
     });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch tokens');
+    }
+
+    return response.json();
 }
 
 export async function signOutUser() {
-    if (!auth) await initializeAuth();
-    return signOut(auth)
-        .then(() => {
-            window.GCMessenger.clearAuthToken();
-            return "Signed out successfully!";
-        })
-        .catch((error) => {
-            console.error(error);
-            throw new Error("Error signing out: " + error.message);
-        });
+    // Clear the auth token from Genesys Cloud
+    window.GCMessenger.clearAuthToken();
+    // Optionally, redirect to Google's logout URL
+    // window.location.href = 'https://accounts.google.com/logout';
+    return "Signed out successfully!";
 }
 
-export function initAuthStateListener(callback) {
-    if (!auth) initializeAuth();
-    return onAuthStateChanged(auth, callback);
+function generateRandomState() {
+    const state = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('oauth_state', state);
+    return state;
 }
