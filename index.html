@@ -1058,7 +1058,7 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	
 	        initAuthStateListener((user) => {
 	            if (user) {
-	                console.log("User is signed in");
+	                console.log("User is signed in", user);
 	                loginButton.textContent = "Logout";
 	                loginButton.removeEventListener('click', signIn);
 	                loginButton.addEventListener('click', signOutUser);
@@ -1072,8 +1072,7 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	    }
 	    
 	    start();
-	</script>
-	  	  
+	</script>  	  
 </body>
 
     <!-- JavaScript Libraries -->
