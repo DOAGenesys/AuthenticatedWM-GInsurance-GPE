@@ -27,6 +27,9 @@ export async function handleAuthCallback() {
         const tokenResponse = await fetchTokens(code);
         const idToken = tokenResponse.id_token;
 
+        // Store the ID token for Genesys Cloud and for AuthProvider plugin
+        localStorage.setItem('google_id_token', idToken);
+
         // Set the ID token for Genesys Cloud
         window.GCMessenger.setAuthToken(idToken);
 
