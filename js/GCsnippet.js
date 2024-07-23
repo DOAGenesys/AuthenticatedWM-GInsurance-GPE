@@ -20,6 +20,17 @@
     deploymentId: window.GCMessagingDeplId
 });
 
+//authenticated messaging functions
+
+function setAuthToken(token) {
+    Genesys("command", "Messenger.setAuthToken", { 
+        authToken: token
+    });
+}
+
+function clearAuthToken() {
+    Genesys("command", "Messenger.clearAuthToken");
+}
 
 function setCookie(cname,cvalue,exdays) {
   const d = new Date();
@@ -27,6 +38,8 @@ function setCookie(cname,cvalue,exdays) {
   let expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
+
+//cookies functions
 
 function getCookie(cname) {
   console.log('GCsnippet.js - getCookie1 Start '); 
@@ -62,6 +75,8 @@ function checkCookie() {
      }
   }
 }
+
+//GPE functions
 
 function FormTrack() {
     console.log("GCsnippet.js - Form track");
