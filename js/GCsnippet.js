@@ -20,7 +20,7 @@
     deploymentId: window.GCMessagingDeplId || ''
 });
 
-// Authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
+//authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
 
 window.GCMessenger = {
     setAuthToken: function(token) {
@@ -41,22 +41,15 @@ window.GCMessenger = {
     }
 };
 
-// Authenticated Web Messaging AuthProvider plugin
-
+// Add the AuthProvider plugin configuration
 Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     AuthProvider.registerCommand('getAuthCode', (e) => {
-        // Assuming the authCode is the idToken we get from Google
-        const authCode = localStorage.getItem('google_id_token');
-        const redirectUri = window.location.origin + '/auth-callback';
-        
-        if (authCode) {
-            e.resolve({
-                authCode: authCode,
-                redirectUri: redirectUri
-            });
-        } else {
-            e.reject('No auth code available');
-        }
+        // Resolve with the authCode obtained from Google Authentication
+        const authCode = localStorage.getItem('authCode');
+        e.resolve({
+            authCode: authCode,
+            redirectUri: window.location.origin + '/auth-callback',
+        });
     });
 
     AuthProvider.registerCommand('reAuthenticate', (e) => {
@@ -75,49 +68,45 @@ Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
     AuthProvider.ready();
 });
 
-// Cookie functions
+//cookies functions
+
 function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 function getCookie(cname) {
-    console.log('GCsnippet.js - getCookie1 Start ');
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    console.log('GCsnippet.js - getCookie2 = ', ca);
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        console.log('GCsnippet.js - getCookie3 = ', c, ca);
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        console.log('GCsnippet.js - getCookie4 = ', c, ca);
-        if (c.indexOf(name) == 0) {
-            console.log('GCsnippet.js - getCookie5 = ', c, ca);
-            return c.substring(name.length, c.length);
-        }
-        console.log('GCsnippet.js - getCookie6 = ', c, ca);
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
     }
-    return "";
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }
 
 function checkCookie() {
-    let user = getCookie("username");
-    if (user != "") {
-        console.log("Welcome again " + user);
-    } else {
-        user = prompt("Please enter your name:", "");
-        if (user != "" && user != null) {
-            setCookie("username", user, 30);
-        }
+  let user = getCookie("username");
+  if (user != "") {
+    console.log("Welcome again " + user);
+  } else {
+    user = prompt("Please enter your name:", "");
+    if (user != "" && user != null) {
+      setCookie("username", user, 30);
     }
+  }
 }
 
-// GPE functions
+//GPE functions
+
 function FormTrack() {
     console.log("GCsnippet.js - Form track");
     if (typeof Genesys === 'function') {
@@ -155,65 +144,65 @@ function IdleTrack() {
 }
 
 function CardSelect() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "credit_card_selection" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "credit_card_selection" });
 }
 
 function ClaimStage() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "claim_stage" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "claim_stage" });
 }
 
 function ClaimType() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "claim_type" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "claim_type" });
 }
 
 function TravelClaimStage() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "travel_claim_stage" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "travel_claim_stage" });
 }
 
 function TravelClaimType() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "travel_claim_type" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "travel_claim_type" });
 }
 
 function HealthCareClaimStage() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "healthcare_claim_stage" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "healthcare_claim_stage" });
 }
 
 function HealthCareClaimType() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "healthcare_claim_type" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "healthcare_claim_type" });
 }
 
 function LifeClaimStage() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "life_claim_stage" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "life_claim_stage" });
 }
 
 function LifeClaimType() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "life_claim_type" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "life_claim_type" });
 }
 
 function MotorClaimStage() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "motor_claim_stage" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "motor_claim_stage" });
 }
 
 function MotorClaimType() {
-    console.log("GCsnippet.js - Dropdown clicked");
-    Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
+console.log("GCsnippet.js - Dropdown clicked");
+Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
 }
 
 function setupJourneySubscriptions() {
     if (typeof Genesys === 'function') {
         // Subscribe to readiness
         Genesys("subscribe", "Journey.ready", function() {
-            console.log("GCsnippet.js - GPE Journey plugin is ready.")
+          console.log("GCsnippet.js - GPE Journey plugin is ready.")
         });
 
         // Subscribe to open actions
