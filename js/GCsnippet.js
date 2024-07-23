@@ -16,7 +16,6 @@
     ys.charset = 'utf-8';
     ys.onload = function() {
         console.log("GCsnippet.js - Genesys script loaded successfully.");
-        registerAuthProvider();  // Register the AuthProvider, needed for authenticated web messaging, after Genesys script is loaded
     };
     ys.onerror = function() {
         console.error("GCsnippet.js - Failed to load Genesys script.");
@@ -29,7 +28,7 @@
 
 //authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
 
-function registerAuthProvider() {
+window.registerAuthProvider = function() {
     console.log("GCsnippet.js - Registering AuthProvider plugin.");
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
@@ -61,7 +60,7 @@ function registerAuthProvider() {
         AuthProvider.ready();
         console.log("GCsnippet.js - AuthProvider plugin ready.");
     });
-}
+};
 
 window.GCMessenger = {
     setAuthToken: function(token) {
