@@ -989,11 +989,9 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	            setWindowConfig(config);
 	            
 	            console.log("Configuration set. Verifying...");
-	            console.log("window.GoogleCloudApiKey:", window.GoogleCloudApiKey);
-	            console.log("window.GoogleCloudClientSecret:", window.GoogleCloudClientSecret);
 	            
-	            if (!window.GoogleCloudApiKey) {
-	                throw new Error("Google Cloud API Key is not set");
+	            if (!window.GoogleCloudClientId) {
+	                throw new Error("Google Cloud Client Id is not set");
 	            }
 	            if (!window.GoogleCloudClientSecret) {
 	                throw new Error("Google Cloud Client Secret is not set");
