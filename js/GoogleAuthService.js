@@ -1,4 +1,4 @@
-import { auth } from './firebase-config.js';
+import { auth } from './GoogleFirebaseConfig.js';
 import { signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { setAuthToken, clearAuthToken } from './GCsnippet.js';
 
