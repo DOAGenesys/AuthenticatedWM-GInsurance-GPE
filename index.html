@@ -1081,8 +1081,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 
         function checkAuthState() {
             console.log("Checking auth state...");
-            // This function should check if there's a valid auth token
-            // For example, you might check if there's a token in localStorage
             const token = localStorage.getItem('authToken');
             console.log("Auth token found:", !!token);
             updateAuthUI(!!token);
