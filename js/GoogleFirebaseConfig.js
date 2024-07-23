@@ -2,8 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "<googleCloudApiKey>",
-    authDomain: "gcopenidauth.firebaseapp.com",
+    apiKey: window.GoogleCloudApiKey,
+    authDomain: window.GoogleCloudAuthDomain
 };
 
 const app = initializeApp(firebaseConfig);
