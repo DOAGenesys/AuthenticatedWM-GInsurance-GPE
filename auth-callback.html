@@ -6,7 +6,14 @@
     <title>Redirecting...</title>
     <script>
         // Preserve all query parameters when redirecting
-        window.location.href = '/index.html' + window.location.search;
+        var currentUrl = window.location.href;
+        var indexOfParams = currentUrl.indexOf('auth-callback?');
+        if (indexOfParams !== -1) {
+            var params = currentUrl.slice(indexOfParams + 'auth-callback?'.length);
+            window.location.href = '/index.html?' + params;
+        } else {
+            window.location.href = '/index.html';
+        }
     </script>
 </head>
 <body>
