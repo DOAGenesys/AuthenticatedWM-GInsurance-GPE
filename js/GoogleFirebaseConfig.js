@@ -6,6 +6,19 @@ const firebaseConfig = {
     authDomain: window.GoogleCloudAuthDomain
 };
 
+// Log the values
+console.log("Firebase Config - apiKey:", firebaseConfig.apiKey);
+console.log("Firebase Config - authDomain:", firebaseConfig.authDomain);
+
+// Check if the values are undefined or empty
+if (!firebaseConfig.apiKey || firebaseConfig.apiKey.trim() === "") {
+    console.error("Firebase apiKey is undefined or empty");
+}
+
+if (!firebaseConfig.authDomain || firebaseConfig.authDomain.trim() === "") {
+    console.error("Firebase authDomain is undefined or empty");
+}
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
