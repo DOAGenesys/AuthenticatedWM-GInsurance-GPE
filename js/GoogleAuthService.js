@@ -1,5 +1,5 @@
-import { signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { setAuthToken, clearAuthToken } from './GCsnippet.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 let auth;
 
@@ -8,13 +8,10 @@ async function initializeAuth() {
         throw new Error('Firebase configuration is not set');
     }
     
-    const { initializeApp, getAuth } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js");
-    
     const firebaseConfig = {
         apiKey: window.GoogleCloudApiKey,
         authDomain: window.GoogleCloudAuthDomain
     };
-
     console.log("Initializing Firebase with config:", firebaseConfig);
     
     const app = initializeApp(firebaseConfig);
@@ -29,7 +26,7 @@ export async function signIn() {
         .then((result) => {
             const credential = OAuthProvider.credentialFromResult(result);
             const accessToken = credential.accessToken;
-            setAuthToken(accessToken);
+            window.GCMessenger.setAuthToken(accessToken);
             return "Signed in successfully!";
         })
         .catch((error) => {
@@ -42,7 +39,7 @@ export async function signOutUser() {
     if (!auth) await initializeAuth();
     return signOut(auth)
         .then(() => {
-            clearAuthToken();
+            window.GCMessenger.clearAuthToken();
             return "Signed out successfully!";
         })
         .catch((error) => {
