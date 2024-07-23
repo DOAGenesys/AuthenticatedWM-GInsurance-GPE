@@ -979,9 +979,11 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	        try {
 	            const response = await fetch('/api/getConfig');
 	            if (!response.ok) {
-	                throw new Error('Environment vars could not be retrieved');
+	                throw new Error(`HTTP error! status: ${response.status}`);
 	            }
-	            return await response.json();
+	            const config = await response.json();
+	            console.log("Fetched config:", config);
+	            return config;
 	        } catch (error) {
 	            console.error("Error fetching config:", error);
 	            throw error;
@@ -1007,8 +1009,11 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	            console.log("window.GoogleCloudApiKey:", window.GoogleCloudApiKey);
 	            console.log("window.GoogleCloudClientSecret:", window.GoogleCloudClientSecret);
 	            
-	            if (!window.GoogleCloudApiKey || !window.GoogleCloudClientSecret) {
-	                throw new Error("Google Cloud configuration is not set properly");
+	            if (!window.GoogleCloudApiKey) {
+	                throw new Error("Google Cloud API Key is not set");
+	            }
+	            if (!window.GoogleCloudClientSecret) {
+	                throw new Error("Google Cloud Client Secret is not set");
 	            }
 	            
 	            initializeAuth();
@@ -1020,29 +1025,78 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	                    const message = await handleAuthCallback();
 	                    console.log(message);
 	                    // Redirect to main page or update UI
+	                    window.location.href = '/'; // Redirect to home page after successful auth
 	                } catch (error) {
 	                    console.error("Auth callback error:", error);
+	                    // Display error to user
+	                    alert("Authentication failed. Please try again.");
 	                }
 	            }
 	        } catch (error) {
 	            console.error("Error in start function:", error);
+	            console.error("Error details:", error.message);
+	            // Display error to user
+	            alert("An error occurred during initialization. Please try refreshing the page.");
 	        }
 	    }
 	    
 	    function initializeAuth() {
 	        const loginButton = document.getElementById('loginButton');
-	        loginButton.addEventListener('click', async (e) => {
-	            e.preventDefault();
-	            try {
-	                await signIn();
-	            } catch (error) {
-	                console.error("Login error:", error);
-	            }
-	        });
+	        const logoutButton = document.getElementById('logoutButton');
 	
-	        // Might want to check if the user is already authenticated here
-	        // and update the UI accordingly
-	    }	    
+	        if (loginButton) {
+	            loginButton.addEventListener('click', async (e) => {
+	                e.preventDefault();
+	                try {
+	                    await signIn();
+	                } catch (error) {
+	                    console.error("Login error:", error);
+	                    alert("Login failed. Please try again.");
+	                }
+	            });
+	        }
+	
+	        if (logoutButton) {
+	            logoutButton.addEventListener('click', async (e) => {
+	                e.preventDefault();
+	                try {
+	                    await signOutUser();
+	                    // Update UI to reflect logged out state
+	                    updateAuthUI(false);
+	                } catch (error) {
+	                    console.error("Logout error:", error);
+	                    alert("Logout failed. Please try again.");
+	                }
+	            });
+	        }
+	
+	        // Check if user is already authenticated
+	        checkAuthState();
+	    }
+	
+	    function checkAuthState() {
+	        // This function should check if there's a valid auth token
+	        // For example, you might check if there's a token in localStorage
+	        const token = localStorage.getItem('authToken');
+	        updateAuthUI(!!token);
+	    }
+	
+	    function updateAuthUI(isAuthenticated) {
+	        const loginButton = document.getElementById('loginButton');
+	        const logoutButton = document.getElementById('logoutButton');
+	        const userInfo = document.getElementById('userInfo');
+	
+	        if (isAuthenticated) {
+	            if (loginButton) loginButton.style.display = 'none';
+	            if (logoutButton) logoutButton.style.display = 'block';
+	            if (userInfo) userInfo.style.display = 'block';
+	        } else {
+	            if (loginButton) loginButton.style.display = 'block';
+	            if (logoutButton) logoutButton.style.display = 'none';
+	            if (userInfo) userInfo.style.display = 'none';
+	        }
+	    }
+	
 	    start();
 	</script>
 </body>
