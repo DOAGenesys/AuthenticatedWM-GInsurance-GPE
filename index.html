@@ -973,6 +973,23 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
         });
     }
 
+    async function loadGCsnippet() {
+        return new Promise((resolve, reject) => {
+            console.log("Loading GCsnippet.js...");
+            const script = document.createElement('script');
+            script.src = "js/GCsnippet.js";
+            script.onload = () => {
+                console.log("GCsnippet.js script loaded successfully.");
+                resolve();
+            };
+            script.onerror = () => {
+                console.error("Failed to load GCsnippet.js script.");
+                reject(new Error("Failed to load GCsnippet.js script."));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
     async function start() {
         try {
             console.log("Start function initiated.");
@@ -1047,23 +1064,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
         if (spinner) {
             spinner.classList.remove('show');
         }
-    }
-
-    function loadGCsnippet() {
-        return new Promise((resolve, reject) => {
-            console.log("Loading GCsnippet.js...");
-            const script = document.createElement('script');
-            script.src = "js/GCsnippet.js";
-            script.onload = () => {
-                console.log("GCsnippet.js script loaded successfully.");
-                resolve();
-            };
-            script.onerror = () => {
-                console.error("Failed to load GCsnippet.js script.");
-                reject(new Error("Failed to load GCsnippet.js script."));
-            };
-            document.head.appendChild(script);
-        });
     }
 
     function initializeAuth() {
