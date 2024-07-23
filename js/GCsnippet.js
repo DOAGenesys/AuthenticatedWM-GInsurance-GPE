@@ -12,13 +12,54 @@
 
     ys = document.createElement('script');
     ys.async = 1;
-    ys.src = n; 
+    ys.src = n;
     ys.charset = 'utf-8';
+    ys.onload = function() {
+        console.log("GCsnippet.js - Genesys script loaded successfully.");
+        registerAuthProvider();  // Register the AuthProvider after Genesys script is loaded
+    };
+    ys.onerror = function() {
+        console.error("GCsnippet.js - Failed to load Genesys script.");
+    };
     document.head.appendChild(ys);
 })(window, 'Genesys', (window.GCDomain || '') + '/genesys-bootstrap/genesys.min.js', {
     environment: window.GCEnvironment || '',
     deploymentId: window.GCMessagingDeplId || ''
 });
+
+function registerAuthProvider() {
+    console.log("GCsnippet.js - Registering AuthProvider plugin.");
+    Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
+        AuthProvider.registerCommand('getAuthCode', (e) => {
+            // Retrieve the authCode from localStorage
+            const authCode = localStorage.getItem('authCode');
+            console.log('AuthProvider.getAuthCode - Retrieved authCode:', authCode); // Log the authCode
+            
+            // Resolve with the authCode obtained from Google Authentication
+            e.resolve({
+                authCode: authCode,
+                redirectUri: window.location.origin + '/auth-callback',
+            });
+        });
+
+        AuthProvider.registerCommand('reAuthenticate', (e) => {
+            console.log('AuthProvider.reAuthenticate - Re-authenticating user.');
+            document.getElementById('loginButton').click(); // simulate the login button click
+            e.resolve();
+        });
+
+        AuthProvider.subscribe('Auth.loggedOut', () => {
+            console.log('AuthProvider - Logged out event received.');
+        });
+
+        AuthProvider.subscribe('Auth.authError', (error) => {
+            console.error('AuthProvider - Auth error event received:', error);
+        });
+
+        AuthProvider.ready();
+        console.log("GCsnippet.js - AuthProvider plugin ready.");
+    });
+}
 
 //authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
 
@@ -40,36 +81,6 @@ window.GCMessenger = {
         }
     }
 };
-
-// Add the AuthProvider plugin configuration
-Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-    AuthProvider.registerCommand('getAuthCode', (e) => {
-        // Retrieve the authCode from localStorage
-        const authCode = localStorage.getItem('authCode');
-        console.log('AuthProvider.getAuthCode - Retrieved authCode:', authCode); // Log the authCode
-        
-        // Resolve with the authCode obtained from Google Authentication
-        e.resolve({
-            authCode: authCode,
-            redirectUri: window.location.origin + '/auth-callback',
-        });
-    });
-
-    AuthProvider.registerCommand('reAuthenticate', (e) => {
-        document.getElementById('loginButton').click(); // simulate the login button click
-        e.resolve();
-    });
-
-    AuthProvider.subscribe('Auth.loggedOut', () => {
-        console.log('Logged out event received.');
-    });
-
-    AuthProvider.subscribe('Auth.authError', (error) => {
-        console.error('Auth error event received:', error);
-    });
-
-    AuthProvider.ready();
-});
 
 //cookies functions
 
@@ -147,65 +158,65 @@ function IdleTrack() {
 }
 
 function CardSelect() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "credit_card_selection" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "credit_card_selection" });
 }
 
 function ClaimStage() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "claim_stage" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "claim_stage" });
 }
 
 function ClaimType() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "claim_type" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "claim_type" });
 }
 
 function TravelClaimStage() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "travel_claim_stage" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "travel_claim_stage" });
 }
 
 function TravelClaimType() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "travel_claim_type" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "travel_claim_type" });
 }
 
 function HealthCareClaimStage() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "healthcare_claim_stage" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "healthcare_claim_stage" });
 }
 
 function HealthCareClaimType() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "healthcare_claim_type" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "healthcare_claim_type" });
 }
 
 function LifeClaimStage() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "life_claim_stage" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "life_claim_stage" });
 }
 
 function LifeClaimType() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "life_claim_type" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "life_claim_type" });
 }
 
 function MotorClaimStage() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "motor_claim_stage" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "motor_claim_stage" });
 }
 
 function MotorClaimType() {
-console.log("GCsnippet.js - Dropdown clicked");
-Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
+    console.log("GCsnippet.js - Dropdown clicked");
+    Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
 }
 
 function setupJourneySubscriptions() {
     if (typeof Genesys === 'function') {
         // Subscribe to readiness
         Genesys("subscribe", "Journey.ready", function() {
-          console.log("GCsnippet.js - GPE Journey plugin is ready.")
+            console.log("GCsnippet.js - GPE Journey plugin is ready.");
         });
 
         // Subscribe to open actions
@@ -218,7 +229,7 @@ function setupJourneySubscriptions() {
             }
         });
     } else {
-        console.error("GCsnippet.js - Genesys function is not available");
+        console.error("GCsnippet.js - Genesys function is not available.");
     }
 }
 
@@ -238,7 +249,7 @@ if (typeof Genesys === 'function') {
         }
     });
 } else {
-    console.error("GCsnippet.js - Genesys function is not available");
+    console.error("GCsnippet.js - Genesys function is not available.");
 }
 
 setupJourneySubscriptions();
