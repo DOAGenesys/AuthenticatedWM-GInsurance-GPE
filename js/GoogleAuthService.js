@@ -5,7 +5,8 @@ import {
     getRedirectResult, 
     signOut, 
     OAuthProvider, 
-    onAuthStateChanged 
+    onAuthStateChanged,
+    browserPopupRedirectResolver
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 let auth;
@@ -30,7 +31,7 @@ const provider = new OAuthProvider(window.GoogleOIDCId);
 export async function signIn() {
     if (!auth) await initializeAuth();
     try {
-        await signInWithRedirect(auth, provider);
+        await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
     } catch (error) {
         console.error("Error initiating sign-in:", error);
         throw new Error("Error initiating sign-in: " + error.message);
@@ -39,18 +40,28 @@ export async function signIn() {
 
 export async function handleRedirectResult() {
     if (!auth) await initializeAuth();
-    try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-            const credential = OAuthProvider.credentialFromResult(result);
-            const accessToken = credential.accessToken;
-            window.GCMessenger.setAuthToken(accessToken);
-            return "Signed in successfully!";
-        }
-    } catch (error) {
-        console.error("Error handling redirect result:", error);
-        throw new Error("Error handling redirect result: " + error.message);
-    }
+    return new Promise((resolve, reject) => {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const result = await getRedirectResult(auth, browserPopupRedirectResolver);
+                    if (result) {
+                        const credential = OAuthProvider.credentialFromResult(result);
+                        const accessToken = credential.accessToken;
+                        window.GCMessenger.setAuthToken(accessToken);
+                        resolve("Signed in successfully!");
+                    } else {
+                        resolve(null); // User is signed in but not as a result of a redirect
+                    }
+                } catch (error) {
+                    console.error("Error handling redirect result:", error);
+                    reject(new Error("Error handling redirect result: " + error.message));
+                }
+            } else {
+                resolve(null); // User is not signed in
+            }
+        });
+    });
 }
 
 export async function signOutUser() {
@@ -66,7 +77,7 @@ export async function signOutUser() {
         });
 }
 
-export async function initAuthStateListener(callback) {
-    if (!auth) await initializeAuth();
-    onAuthStateChanged(auth, callback);
+export function initAuthStateListener(callback) {
+    if (!auth) initializeAuth();
+    return onAuthStateChanged(auth, callback);
 }
