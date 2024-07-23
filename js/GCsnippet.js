@@ -6,30 +6,38 @@
     g[e].t = 1 * new Date();
     g[e].c = es;
 
-    console.log("GCsnippet.js - Genesys Domain:", window.GCDomain);
-    console.log("GCsnippet.js - Genesys Environment:", window.GCEnvironment);
-    console.log("GCsnippet.js - Genesys Messaging Deployment ID:", window.GCMessagingDeplId);
+    console.log("GCsnippet.js - Genesys Domain:", window.GCDomain || "Not set");
+    console.log("GCsnippet.js - Genesys Environment:", window.GCEnvironment || "Not set");
+    console.log("GCsnippet.js - Genesys Messaging Deployment ID:", window.GCMessagingDeplId || "Not set");
 
     ys = document.createElement('script');
     ys.async = 1;
     ys.src = n; 
     ys.charset = 'utf-8';
     document.head.appendChild(ys);
-})(window, 'Genesys', window.GCDomain + '/genesys-bootstrap/genesys.min.js', {
-    environment: window.GCEnvironment,
-    deploymentId: window.GCMessagingDeplId
+})(window, 'Genesys', (window.GCDomain || '') + '/genesys-bootstrap/genesys.min.js', {
+    environment: window.GCEnvironment || '',
+    deploymentId: window.GCMessagingDeplId || ''
 });
 
 //authenticated messaging functions
 
 export function setAuthToken(token) {
-    Genesys("command", "Messenger.setAuthToken", { 
-        authToken: token
-    });
+    if (typeof Genesys === 'function') {
+        Genesys("command", "Messenger.setAuthToken", { 
+            authToken: token
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
 export function clearAuthToken() {
-    Genesys("command", "Messenger.clearAuthToken");
+    if (typeof Genesys === 'function') {
+        Genesys("command", "Messenger.clearAuthToken");
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
 function setCookie(cname,cvalue,exdays) {
@@ -48,31 +56,30 @@ function getCookie(cname) {
   let ca = decodedCookie.split(';');
   console.log('GCsnippet.js - getCookie2 = ',ca);
   for(let i = 0; i < ca.length; i++) {
-	let c = ca[i];
-	console.log('GCsnippet.js - getCookie3 = ',c,ca);
+    let c = ca[i];
+    console.log('GCsnippet.js - getCookie3 = ',c,ca);
     while (c.charAt(0) == ' ') {
       c = c.substring(1);
     }
-	console.log('GCsnippet.js - getCookie4 = ',c,ca);
+    console.log('GCsnippet.js - getCookie4 = ',c,ca);
     if (c.indexOf(name) == 0) {
-	        return c.substring(name.length, c.length);
-			console.log('GCsnippet.js - getCookie5 = ',c,ca);
+      console.log('GCsnippet.js - getCookie5 = ',c,ca);
+      return c.substring(name.length, c.length);
     }
-	console.log('GCsnippet.js - getCookie6 = ',c,ca);
+    console.log('GCsnippet.js - getCookie6 = ',c,ca);
   }
   return "";
-  
 }
 
 function checkCookie() {
   let user = getCookie("username");
   if (user != "") {
-    alert("Welcome again " + user);
+    console.log("Welcome again " + user);
   } else {
-     user = prompt("Please enter your name:","");
-     if (user != "" && user != null) {
-       setCookie("username", user, 30);
-     }
+    user = prompt("Please enter your name:","");
+    if (user != "" && user != null) {
+      setCookie("username", user, 30);
+    }
   }
 }
 
@@ -80,26 +87,38 @@ function checkCookie() {
 
 function FormTrack() {
     console.log("GCsnippet.js - Form track");
-    Genesys("command", "Journey.formsTrack", {
-        selector: "form",
-        captureFormDataOnAbandon: true
-    });
+    if (typeof Genesys === 'function') {
+        Genesys("command", "Journey.formsTrack", {
+            selector: "form",
+            captureFormDataOnAbandon: true
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
 function ButtonClickTrack() {
     console.log("GCsnippet.js - Button click track");
-    Genesys("command", "Journey.trackClickEvents", {
-        clickEvents: [
-            { selector: "button.btn", eventName: "button_click" }
-        ]
-    });
+    if (typeof Genesys === 'function') {
+        Genesys("command", "Journey.trackClickEvents", {
+            clickEvents: [
+                { selector: "button.btn", eventName: "button_click" }
+            ]
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
 function IdleTrack() {
     console.log("GCsnippet.js - Idle 120 seconds track");
-    Genesys("command", "Journey.trackIdleEvents", {
-        idleEvents: [{ idleAfterSeconds: 120, eventName: "user_idle_120_seconds" }]
-    });
+    if (typeof Genesys === 'function') {
+        Genesys("command", "Journey.trackIdleEvents", {
+            idleEvents: [{ idleAfterSeconds: 120, eventName: "user_idle_120_seconds" }]
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
 function CardSelect() {
@@ -158,35 +177,44 @@ Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
 }
 
 function setupJourneySubscriptions() {
-    // Subscribe to readiness
-    Genesys("subscribe", "Journey.ready", function() {
-      console.log("GCsnippet.js - GPE Journey plugin is ready.")
-    });
+    if (typeof Genesys === 'function') {
+        // Subscribe to readiness
+        Genesys("subscribe", "Journey.ready", function() {
+          console.log("GCsnippet.js - GPE Journey plugin is ready.")
+        });
 
-    // Subscribe to open actions
-    Genesys("subscribe", "Journey.qualifiedOpenAction", function(event) {
-        console.log("GCsnippet.js - Received GPE qualified open action event:", event);
+        // Subscribe to open actions
+        Genesys("subscribe", "Journey.qualifiedOpenAction", function(event) {
+            console.log("GCsnippet.js - Received GPE qualified open action event:", event);
 
-        if (event.data.openActionProperties.openActionName.startsWith("GPE and SF - ")) {
-            console.log("GCsnippet.js - Triggering Salesforce Web Messaging...");
-            launchSalesforceChat();
-        }
-    });
+            if (event.data.openActionProperties.openActionName.startsWith("GPE and SF - ")) {
+                console.log("GCsnippet.js - Triggering Salesforce Web Messaging...");
+                launchSalesforceChat();
+            }
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available");
+    }
 }
 
-console.log('GCsnippet.js - Customer email address is ', window.customerEmail);
-username=getCookie("username");
-console.log('GCsnippet.js - Cookie customer email address is ',this.username);
-Genesys("command", "Database.set", {
-    messaging: {
-        customAttributes: {
-                ID: username,
-                browser_language: navigator.language,
+console.log('GCsnippet.js - Customer email address is ', window.customerEmail || "Not set");
+let username = getCookie("username") || "";
+console.log('GCsnippet.js - Cookie customer email address is ', username);
+
+if (typeof Genesys === 'function') {
+    Genesys("command", "Database.set", {
+        messaging: {
+            customAttributes: {
+                ID: username || "Unknown",
+                browser_language: navigator.language || "Unknown",
                 vertical: "insurance",
-		language: "english"
-               }
-         }
-  });
+                language: "english"
+            }
+        }
+    });
+} else {
+    console.error("GCsnippet.js - Genesys function is not available");
+}
 
 setupJourneySubscriptions();
 FormTrack();
