@@ -973,7 +973,7 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
     ></a>
 	<script src="js/GCsnippet.js"></script>
 	<script type="module">
-	    import { signIn, signOutUser, initAuthStateListener, handleRedirectResult } from './js/GoogleAuthService.js';
+	    import { signIn, signOutUser, handleAuthCallback } from './js/GoogleAuthService.js';
 	    
 	    async function getConfig() {
 	        try {
@@ -995,16 +995,6 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	        });
 	    }
 	
-	    async function loadScript(url) {
-	        return new Promise((resolve, reject) => {
-	            const script = document.createElement('script');
-	            script.src = url;
-	            script.onload = resolve;
-	            script.onerror = reject;
-	            document.head.appendChild(script);
-	        });
-	    }
-	
 	    async function start() {
 	        try {
 	            console.log("Fetching configuration...");
@@ -1015,29 +1005,24 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	            
 	            console.log("Configuration set. Verifying...");
 	            console.log("window.GoogleCloudApiKey:", window.GoogleCloudApiKey);
-	            console.log("window.GoogleCloudAuthDomain:", window.GoogleCloudAuthDomain);
+	            console.log("window.GoogleCloudClientSecret:", window.GoogleCloudClientSecret);
 	            
-	            if (!window.GoogleCloudApiKey || !window.GoogleCloudAuthDomain) {
-	                throw new Error("Firebase configuration is not set properly");
+	            if (!window.GoogleCloudApiKey || !window.GoogleCloudClientSecret) {
+	                throw new Error("Google Cloud configuration is not set properly");
 	            }
 	            
-	            console.log("Loading main.js...");
-	            await loadScript('js/main.js');
-	            console.log("main.js loaded");
-	            
-	            console.log("Initializing auth...");
 	            initializeAuth();
 	            console.log("Auth initialized");
 	
-	            // Handle redirect result
-	            try {
-	                const message = await handleRedirectResult();
-	                if (message) {
+	            // Handle auth callback if on the callback page
+	            if (window.location.pathname === '/auth-callback') {
+	                try {
+	                    const message = await handleAuthCallback();
 	                    console.log(message);
-	                    // Update UI to reflect signed-in state
+	                    // Redirect to main page or update UI
+	                } catch (error) {
+	                    console.error("Auth callback error:", error);
 	                }
-	            } catch (error) {
-	                console.error("Redirect result error:", error);
 	            }
 	        } catch (error) {
 	            console.error("Error in start function:", error);
@@ -1050,29 +1035,16 @@ I wanted to take a moment to express my sincere appreciation for the outstanding
 	            e.preventDefault();
 	            try {
 	                await signIn();
-	                // The page will redirect, so no need for further action here
 	            } catch (error) {
 	                console.error("Login error:", error);
 	            }
 	        });
 	
-	        initAuthStateListener((user) => {
-	            if (user) {
-	                console.log("User is signed in", user);
-	                loginButton.textContent = "Logout";
-	                loginButton.removeEventListener('click', signIn);
-	                loginButton.addEventListener('click', signOutUser);
-	            } else {
-	                console.log("User is signed out");
-	                loginButton.textContent = "Login";
-	                loginButton.removeEventListener('click', signOutUser);
-	                loginButton.addEventListener('click', signIn);
-	            }
-	        });
-	    }
-	    
+	        // Might want to check if the user is already authenticated here
+	        // and update the UI accordingly
+	    }	    
 	    start();
-	</script>  	  
+	</script>
 </body>
 
     <!-- JavaScript Libraries -->
