@@ -20,7 +20,7 @@
     deploymentId: window.GCMessagingDeplId || ''
 });
 
-//authenticated messaging functions, exported through the window object
+//authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
 
 window.GCMessenger = {
     setAuthToken: function(token) {
