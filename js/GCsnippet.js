@@ -45,7 +45,7 @@ window.registerAuthProvider = function() {
 
         AuthProvider.registerCommand('reAuthenticate', (e) => {
             console.log('AuthProvider.reAuthenticate - Re-authenticating user.');
-            document.getElementById('loginButton').click(); // simulate the login button click
+            //document.getElementById('loginButton').click(); // simulate the login button click
             e.resolve();
         });
 
