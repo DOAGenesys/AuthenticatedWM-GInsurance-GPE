@@ -1,5 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAuth, signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { 
+    getAuth, 
+    signInWithRedirect, 
+    getRedirectResult, 
+    signOut, 
+    OAuthProvider, 
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 let auth;
 
@@ -22,17 +29,28 @@ const provider = new OAuthProvider(window.GoogleOIDCId);
 
 export async function signIn() {
     if (!auth) await initializeAuth();
-    return signInWithPopup(auth, provider)
-        .then((result) => {
+    try {
+        await signInWithRedirect(auth, provider);
+    } catch (error) {
+        console.error("Error initiating sign-in:", error);
+        throw new Error("Error initiating sign-in: " + error.message);
+    }
+}
+
+export async function handleRedirectResult() {
+    if (!auth) await initializeAuth();
+    try {
+        const result = await getRedirectResult(auth);
+        if (result) {
             const credential = OAuthProvider.credentialFromResult(result);
             const accessToken = credential.accessToken;
             window.GCMessenger.setAuthToken(accessToken);
             return "Signed in successfully!";
-        })
-        .catch((error) => {
-            console.error(error);
-            throw new Error("Error signing in: " + error.message);
-        });
+        }
+    } catch (error) {
+        console.error("Error handling redirect result:", error);
+        throw new Error("Error handling redirect result: " + error.message);
+    }
 }
 
 export async function signOutUser() {
