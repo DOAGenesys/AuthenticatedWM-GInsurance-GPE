@@ -20,25 +20,28 @@
     deploymentId: window.GCMessagingDeplId || ''
 });
 
-//authenticated messaging functions
+//authenticated messaging functions, exported through the window object
 
-export function setAuthToken(token) {
-    if (typeof Genesys === 'function') {
-        Genesys("command", "Messenger.setAuthToken", { 
-            authToken: token
-        });
-    } else {
-        console.error("GCsnippet.js - Genesys function is not available");
+window.GCMessenger = {
+    setAuthToken: function(token) {
+        if (typeof Genesys === 'function') {
+            Genesys("command", "Messenger.setAuthToken", { 
+                authToken: token
+            });
+        } else {
+            console.error("GCsnippet.js - Genesys function is not available");
+        }
+    },
+    clearAuthToken: function() {
+        if (typeof Genesys === 'function') {
+            Genesys("command", "Messenger.clearAuthToken");
+        } else {
+            console.error("GCsnippet.js - Genesys function is not available");
+        }
     }
-}
+};
 
-export function clearAuthToken() {
-    if (typeof Genesys === 'function') {
-        Genesys("command", "Messenger.clearAuthToken");
-    } else {
-        console.error("GCsnippet.js - Genesys function is not available");
-    }
-}
+//cookies functions
 
 function setCookie(cname,cvalue,exdays) {
   const d = new Date();
@@ -46,8 +49,6 @@ function setCookie(cname,cvalue,exdays) {
   let expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
-
-//cookies functions
 
 function getCookie(cname) {
   console.log('GCsnippet.js - getCookie1 Start '); 
