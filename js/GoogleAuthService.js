@@ -1,10 +1,30 @@
-import { auth } from './GoogleFirebaseConfig.js';
 import { signInWithPopup, signOut, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { setAuthToken, clearAuthToken } from './GCsnippet.js';
 
+let auth;
+
+async function initializeAuth() {
+    if (typeof window.GoogleCloudApiKey === 'undefined' || typeof window.GoogleCloudAuthDomain === 'undefined') {
+        throw new Error('Firebase configuration is not set');
+    }
+    
+    const { initializeApp, getAuth } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js");
+    
+    const firebaseConfig = {
+        apiKey: window.GoogleCloudApiKey,
+        authDomain: window.GoogleCloudAuthDomain
+    };
+
+    console.log("Initializing Firebase with config:", firebaseConfig);
+    
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+}
+
 const provider = new OAuthProvider(window.GoogleOIDCId);
 
-export function signIn() {
+export async function signIn() {
+    if (!auth) await initializeAuth();
     return signInWithPopup(auth, provider)
         .then((result) => {
             const credential = OAuthProvider.credentialFromResult(result);
@@ -18,7 +38,8 @@ export function signIn() {
         });
 }
 
-export function signOutUser() {
+export async function signOutUser() {
+    if (!auth) await initializeAuth();
     return signOut(auth)
         .then(() => {
             clearAuthToken();
@@ -30,6 +51,7 @@ export function signOutUser() {
         });
 }
 
-export function initAuthStateListener(callback) {
+export async function initAuthStateListener(callback) {
+    if (!auth) await initializeAuth();
     onAuthStateChanged(auth, callback);
 }
