@@ -4,7 +4,7 @@ const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 export async function signIn() {
     const params = new URLSearchParams({
         client_id: window.GoogleCloudClientId,
-        redirect_uri: window.location.origin + '/auth-callback',
+        redirect_uri: window.location.origin + '/auth-callback.html',
         response_type: 'code',
         scope: 'openid email profile',
         state: generateRandomState()
@@ -57,7 +57,7 @@ async function fetchTokens(code) {
             code,
             client_id: window.GoogleCloudClientId,
             client_secret: window.GoogleCloudClientSecret,
-            redirect_uri: window.location.origin + '/auth-callback',
+            redirect_uri: window.location.origin + '/auth-callback.html',
             grant_type: 'authorization_code',
         }),
     });
