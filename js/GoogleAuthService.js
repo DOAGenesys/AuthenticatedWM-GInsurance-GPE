@@ -20,7 +20,7 @@ export async function handleAuthCallback() {
     const code = urlParams.get('code');
     const state = urlParams.get('state');
 
-    console.log('GoogleAuthService.js - URL Parameters:', { code, state });
+    console.log('GoogleAuthService_snippet.js - URL Parameters:', { code, state });
 
     if (!code || !state) {
         throw new Error('No code or state found in the URL');
@@ -30,7 +30,7 @@ export async function handleAuthCallback() {
         throw new Error('Invalid state parameter');
     }
 
-    console.log('GoogleAuthService.js - Valid code and state received:', { code, state });
+    console.log('GoogleAuthService_snippet.js - Valid code and state received:', { code, state });
 
     try {
         const tokenResponse = await fetchTokens(code);
@@ -42,16 +42,14 @@ export async function handleAuthCallback() {
         // Store the authorization code and ID token for Genesys Cloud
         localStorage.setItem('authCode', code);
         localStorage.setItem('idToken', idToken);
-        console.log('GoogleAuthService.js - Storing authCode:', code);
-        
-        // The registerAuthProvider call is now handled in GCadvancedSnippet.js
-        // So we don't need to call it here anymore
+        console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
+    
         
         window.GCMessenger.setAuthToken(idToken);
 
         return "Signed in successfully!";
     } catch (error) {
-        console.error('GoogleAuthService.js - Error during token exchange or validation:', error);
+        console.error('GoogleAuthService_snippet.js - Error during token exchange or validation:', error);
         throw new Error('Authentication failed. Please try again.');
     }
 }
@@ -84,7 +82,7 @@ async function validateIdToken(idToken) {
     await window.initializationPromise;  
     // Check if jwt_decode is available
     if (typeof jwt_decode !== 'function') {
-        console.error('GoogleAuthService.js - jwt_decode is not available. Make sure to include the library.');
+        console.error('GoogleAuthService_snippet.js - jwt_decode is not available. Make sure to include the library.');
         throw new Error('JWT decode function is not available');
     }
 
