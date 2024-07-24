@@ -20,14 +20,14 @@ The integration includes the following components:
 ### Google Cloud OpenID Connect Setup
 
 1. Create a new project in the Google Cloud Console or use an existing one.
-2. Enable the Identity Platform API for your project.
+2. Go to credentials (https://console.cloud.google.com/apis/credentials)
 3. Configure OAuth consent screen and create OAuth 2.0 client credentials (client ID and client secret).
-4. Set up authorized redirect URIs for your application.
+4. Set up "Authorised JavaScript origins" (https://<yourSiteURL>) and Authorised redirect URIs (https://<yourSiteURL>/index.html) for your application.
 
 ### Genesys Cloud Setup
 
-1. Configure a Genesys Cloud Web Messaging deployment for authenticated messaging.
-
+1. Configure a Genesys Cloud Messaging deployment for authenticated messaging (authentication enabled)
+2. Install and configure a new OpenID Connect Messenger Configuration, using the Google OAuth credentials, and for the Discovery Uri, use: https://accounts.google.com/.well-known/openid-configuration
 
 ### Web Application Setup
 
@@ -56,7 +56,7 @@ This section provides an in-depth explanation of how Genesys Cloud authenticated
    - The user is redirected to the Google sign-in page.
 
 3. **Authorization Code Receipt**:
-   - After successful authentication, Google redirects back to your application's callback URL with an authorization code.
+   - After successful authentication, Google redirects back to your application's callback URL (/index.html) with an authorization code.
    - The `handleAuthCallback()` function in `GoogleAuthService.js` processes this callback.
 
 4. **Token Exchange**:
@@ -92,14 +92,6 @@ This section provides an in-depth explanation of how Genesys Cloud authenticated
    - Contains the main structure of the web application.
    - Imports and initializes both Google authentication and Genesys Cloud services.
 
-### Data Flow and Security
-
-1. User credentials are sent directly to Google and never pass through your server.
-2. The authorization code is sent from Google to your frontend application.
-3. Your frontend exchanges this code for tokens with Google.
-4. The ID token is used to authenticate with Genesys Cloud Web messaging.
-5. All communications use HTTPS to ensure data security in transit.
-6. Tokens are stored in the browser's localStorage, which should be used cautiously and cleared on logout.
 
 ## Testing Steps
 
