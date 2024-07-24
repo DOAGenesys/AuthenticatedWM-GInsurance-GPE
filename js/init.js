@@ -1,5 +1,4 @@
-import { signIn, signOutUser, handleAuthCallback } from './GoogleAuthService.js';
-
+import { signIn, handleAuthCallback } from './GoogleAuthService.js';
 
 // Create a global promise for initialization
 window.initializationPromise = new Promise(async (resolve, reject) => {
@@ -121,7 +120,13 @@ function initializeAuth() {
             e.preventDefault();
             try {
                 console.log("init_snippet.js - Logout button clicked. Initiating sign out...");
-                await signOutUser();
+                if (window.GCMessenger && typeof window.GCMessenger.logout === 'function') {
+                    await window.GCMessenger.logout();
+                } else {
+                    console.error("init_snippet.js - GCMessenger logout function not available");
+                }
+                // Clear local storage
+                localStorage.removeItem('authCode');
                 updateAuthUI(false);
             } catch (error) {
                 console.error("init_snippet.js - Logout failed:", error.message);
@@ -137,9 +142,9 @@ function initializeAuth() {
 
 function checkAuthState() {
     console.log("init_snippet.js - Checking auth state...");
-    const token = localStorage.getItem('authToken');
-    console.log("init_snippet.js - Auth token found:", !!token);
-    updateAuthUI(!!token);
+    const authCode = localStorage.getItem('authCode');
+    console.log("init_snippet.js - Auth code found:", !!authCode);
+    updateAuthUI(!!authCode);
 }
 
 function updateAuthUI(isAuthenticated) {
