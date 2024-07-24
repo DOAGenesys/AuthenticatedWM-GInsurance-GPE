@@ -9,27 +9,7 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
-function initializeGCAdvancedSnippet() {
-    // GCMessenger functions
-    window.GCMessenger = {
-        setAuthToken: function(token) {
-            if (typeof Genesys === 'function') {
-                Genesys("command", "Messenger.setAuthToken", { 
-                    authToken: token
-                });
-            } else {
-                console.error("GCadvancedsnippet.js - Genesys function is not available");
-            }
-        },
-        clearAuthToken: function() {
-            if (typeof Genesys === 'function') {
-                Genesys("command", "Messenger.clearAuthToken");
-            } else {
-                console.error("GCadvancedsnippet.js - Genesys function is not available");
-            }
-        }
-    };
-    
+function initializeGCAdvancedSnippet() {    
     //cookies functions
     
     function setCookie(cname, cvalue, exdays) {
