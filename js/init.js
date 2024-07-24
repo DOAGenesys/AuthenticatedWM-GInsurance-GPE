@@ -4,33 +4,33 @@ import { signIn, signOutUser, handleAuthCallback } from './GoogleAuthService.js'
 // Create a global promise for initialization
 window.initializationPromise = new Promise(async (resolve, reject) => {
     try {
-        console.log("Initialization started.");
+        console.log("init_snippet.js - Initialization started.");
         const config = await getConfig();
         setWindowConfig(config);
         
-        console.log("Configuration set. Verifying...");
+        console.log("init_snippet.js - Configuration set. Verifying...");
         
         if (!window.GoogleCloudClientId || !window.GoogleCloudClientSecret) {
             throw new Error("Google Cloud configuration is incomplete");
         }
         
-        console.log("Google Cloud configuration verified.");
+        console.log("init_snippet.js - Google Cloud configuration verified.");
 
         if (!config.GCDomain || !config.GCEnvironment || !config.GCMessagingDeplId) {
             throw new Error("GC configuration is incomplete");
         }
-        console.log("GC configuration verified.");
+        console.log("init_snippet.js - GC configuration verified.");
 
-        console.log("Initialization completed successfully.");
+        console.log("init_snippet.js - Initialization completed successfully.");
         resolve();
     } catch (error) {
-        console.error("Initialization failed:", error);
+        console.error("init_snippet.js - Initialization failed:", error);
         reject(error);
     }
 });
 
 async function getConfig() {
-    console.log("Attempting to fetch configuration...");
+    console.log("init_snippet.js - Attempting to fetch configuration...");
     try {
         const response = await fetch('/api/getConfig');
         if (!response.ok) {
@@ -39,7 +39,7 @@ async function getConfig() {
         const config = await response.json();
         return config;
     } catch (error) {
-        console.error("Error fetching config:", error);
+        console.error("init_snippet.js - Error fetching config:", error);
         throw error;
     }
 }
@@ -52,11 +52,11 @@ function setWindowConfig(config) {
 
 async function start() {
     try {
-        console.log("Start function initiated.");
+        console.log("init_snippet.js - Start function initiated.");
         
-        console.log("Initializing auth...");
+        console.log("init_snippet.js - Initializing auth...");
         initializeAuth();
-        console.log("Auth initialized");
+        console.log("init_snippet.js - Auth initialized");
 
         // Check if this is an auth callback
         const urlParams = new URLSearchParams(window.location.search);
@@ -66,23 +66,23 @@ async function start() {
         console.log('Auth callback URL Parameters:', { code, state });
 
         if (code && state) {
-            console.log("Auth callback detected. Processing...");
+            console.log("init_snippet.js - Auth callback detected. Processing...");
             try {
                 const message = await handleAuthCallback();
-                console.log("Auth callback processed:", message);
+                console.log("init_snippet.js - Auth callback processed:", message);
                 // Update UI to reflect signed-in state
                 updateAuthUI(true);
                 // Remove the query parameters from the URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             } catch (error) {
-                console.error("Auth callback error:", error);
-                console.error("Authentication failed:", error.message);
+                console.error("init_snippet.js - Auth callback error:", error);
+                console.error("init_snippet.js - Authentication failed:", error.message);
             }
         }
-        console.log("Start function completed successfully.");
+        console.log("init_snippet.js - Start function completed successfully.");
     } catch (error) {
-        console.error("Error in start function:", error);
-        console.error("An error occurred during initialization:", error.message);
+        console.error("init_snippet.js - Error in start function:", error);
+        console.error("init_snippet.js - An error occurred during initialization:", error.message);
     } finally {
         hideSpinner();
     }
@@ -96,19 +96,19 @@ function hideSpinner() {
 }
 
 function initializeAuth() {
-    console.log("Initializing auth...");
+    console.log("init_snippet.js - Initializing auth...");
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
 
     if (loginButton) {
-        console.log("Login button found. Adding event listener.");
+        console.log("init_snippet.js - Login button found. Adding event listener.");
         loginButton.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
-                console.log("Login button clicked. Initiating sign in...");
+                console.log("init_snippet.js - Login button clicked. Initiating sign in...");
                 await signIn();
             } catch (error) {
-                console.error("Login failed:", error.message);
+                console.error("init_snippet.js - Login failed:", error.message);
             }
         });
     } else {
@@ -116,34 +116,34 @@ function initializeAuth() {
     }
 
     if (logoutButton) {
-        console.log("Logout button found. Adding event listener.");
+        console.log("init_snippet.js - Logout button found. Adding event listener.");
         logoutButton.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
-                console.log("Logout button clicked. Initiating sign out...");
+                console.log("init_snippet.js - Logout button clicked. Initiating sign out...");
                 await signOutUser();
                 updateAuthUI(false);
             } catch (error) {
-                console.error("Logout failed:", error.message);
+                console.error("init_snippet.js - Logout failed:", error.message);
             }
         });
     } else {
         console.warn("Logout button not found in the DOM.");
     }
 
-    console.log("Checking initial auth state...");
+    console.log("init_snippet.js - Checking initial auth state...");
     checkAuthState();
 }
 
 function checkAuthState() {
-    console.log("Checking auth state...");
+    console.log("init_snippet.js - Checking auth state...");
     const token = localStorage.getItem('authToken');
-    console.log("Auth token found:", !!token);
+    console.log("init_snippet.js - Auth token found:", !!token);
     updateAuthUI(!!token);
 }
 
 function updateAuthUI(isAuthenticated) {
-    console.log("Updating auth UI. Authenticated:", isAuthenticated);
+    console.log("init_snippet.js - Updating auth UI. Authenticated:", isAuthenticated);
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
     const userInfo = document.getElementById('userInfo');
@@ -157,13 +157,13 @@ function updateAuthUI(isAuthenticated) {
         if (logoutButton) logoutButton.style.display = 'none';
         if (userInfo) userInfo.style.display = 'none';
     }
-    console.log("Auth UI updated.");
+    console.log("init_snippet.js - Auth UI updated.");
 }
 
 // Wait for initialization to complete before starting the application
 window.initializationPromise.then(() => {
-    console.log("Initialization promise resolved. Starting application...");
+    console.log("init_snippet.js - Initialization promise resolved. Starting application...");
     start();
 }).catch(error => {
-    console.error("Failed to initialize:", error);
+    console.error("init_snippet.js - Failed to initialize:", error);
 });
