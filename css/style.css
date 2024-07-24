@@ -469,3 +469,33 @@
 .footer .copyright a:hover {
     color: #FFFFFF;
 }
+
+/* Custom Styles for Google Sign-In Button */
+.gsi-material-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: 1px solid #015FC9;
+  border-radius: 5px;
+  background-color: #015FC9; 
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  color: #FFFFFF; 
+}
+
+.gsi-material-button:hover {
+  background-color: #0DD3F1; 
+  border-color: #0DD3F1; 
+}
+
+.gsi-material-button .gsi-material-button-icon svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+  font-size: 16px;
+  font-weight: 500; 
+}
