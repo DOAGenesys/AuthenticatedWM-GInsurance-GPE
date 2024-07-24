@@ -9,7 +9,6 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
-
 function initializeGCSnippet() {
     (function (g, e, n, es, ys) {
         g['_genesysJs'] = e;
