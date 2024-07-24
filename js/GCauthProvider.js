@@ -14,7 +14,7 @@ function initializeAuthProvider() {
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
             const authCode = localStorage.getItem('authCode');
-            console.log('AuthProvider.getAuthCode - Retrieved authCode:', authCode);
+            console.log('AuthProvider_snippet.js - Retrieved authCode:', authCode);
             
             e.resolve({
                 authCode: authCode,
@@ -23,20 +23,20 @@ function initializeAuthProvider() {
         });
 
         AuthProvider.registerCommand('reAuthenticate', (e) => {
-            console.log('AuthProvider.reAuthenticate - Re-authenticating user.');
+            console.log('AuthProvider_snippet.js.reAuthenticate - Re-authenticating user.');
             // Implement re-authentication logic here
             e.resolve();
         });
 
         AuthProvider.subscribe('Auth.loggedOut', () => {
-            console.log('AuthProvider - Logged out event received.');
+            console.log('AuthProvider_snippet.js - Logged out event received.');
         });
 
         AuthProvider.subscribe('Auth.authError', (error) => {
-            console.error('AuthProvider - Auth error event received:', error);
+            console.error('AuthProvider_snippet.js - Auth error event received:', error);
         });
 
         AuthProvider.ready();
-        console.log("AuthProvider plugin ready.");
+        console.log("AuthProvider_snippet.js - AuthProvider plugin ready.");
     });
 }
