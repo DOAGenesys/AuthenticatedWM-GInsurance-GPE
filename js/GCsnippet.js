@@ -2,7 +2,6 @@
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
         initializeGCSnippet();
-        initializeGCAdvancedSnippet();
     }).catch(error => {
         console.error("Failed to initialize GCsnippet.js:", error);
     });
@@ -29,6 +28,7 @@ function initializeGCSnippet() {
         ys.charset = 'utf-8';
         ys.onload = function() {
             console.log("GCsnippet.js - Genesys script loaded successfully.");
+            initializeGCAdvancedSnippet();
         };
         ys.onerror = function() {
             console.error("GCsnippet.js - Failed to load Genesys script.");
