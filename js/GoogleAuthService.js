@@ -44,8 +44,6 @@ export async function handleAuthCallback() {
         localStorage.setItem('idToken', idToken);
         console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
         console.log('GoogleAuthService_snippet.js - Storing idToken:', idToken);
-    
-        window.GCMessenger.setAuthToken(idToken);
 
         return "Signed in successfully!";
     } catch (error) {
@@ -114,7 +112,7 @@ export async function signOutUser() {
     await window.initializationPromise;  
     localStorage.removeItem('authCode');
     localStorage.removeItem('idToken');
-    window.GCMessenger.clearAuthToken();
+    window.GCMessenger.logout();
     return "Signed out successfully!";
 }
 
