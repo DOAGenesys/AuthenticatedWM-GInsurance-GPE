@@ -22,12 +22,6 @@ function initializeAuthProvider() {
             });
         });
 
-        AuthProvider.registerCommand('reAuthenticate', (e) => {
-            console.log('AuthProvider_snippet.js.reAuthenticate - Re-authenticating user.');
-            // Implement re-authentication logic here
-            e.resolve();
-        });
-
         AuthProvider.subscribe('Auth.loggedOut', () => {
             console.log('AuthProvider_snippet.js - Logged out event received.');
         });
