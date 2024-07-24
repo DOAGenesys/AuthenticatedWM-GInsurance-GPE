@@ -1,0 +1,8 @@
+{
+  "name": "GInsurance-google-auth",
+  "version": "1.0.0",
+  "description": "GInsurance site including Genesys Cloud authenticated messaging with Google OpenID Connect, and GPE",
+  "dependencies": {
+    "jwt-decode": "^4.0.0"
+  }
+}
