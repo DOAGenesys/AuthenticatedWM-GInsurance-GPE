@@ -42,7 +42,7 @@ The integration includes the following components:
 
 ## Detailed Integration Process
 
-This section provides an in-depth explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect.
+This section provides an explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect.
 
 ### Authentication Flow
 
