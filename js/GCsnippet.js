@@ -2,6 +2,7 @@
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
         initializeGCSnippet();
+        initializeAuthProvider();
     }).catch(error => {
         console.error("Failed to initialize GCsnippet.js:", error);
     });
@@ -266,4 +267,22 @@ function initializeGCAdvancedSnippet() {
     FormTrack();
     ButtonClickTrack();
     IdleTrack();
+}
+
+function initializeAuthProvider() {
+    Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
+        AuthProvider.registerCommand('getAuthCode', (e) => {
+            const authCode = localStorage.getItem('authCode');
+            console.log('AuthProvider_snippet.js - Retrieved authCode:', authCode);
+            
+            if (authCode) {
+                e.resolve({
+                    authCode: authCode,
+                    redirectUri: window.location.origin + '/index.html',
+                });
+            } else {
+                e.reject(new Error('Auth code not found in localStorage'));
+            }
+        });
+    });
 }
