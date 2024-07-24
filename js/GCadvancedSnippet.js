@@ -9,44 +9,8 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
-
 function initializeGCAdvancedSnippet() {
-    //authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
-    
-    window.registerAuthProvider = function() {
-        console.log("GCadvancedsnippet.js - Registering AuthProvider plugin.");
-        Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-            AuthProvider.registerCommand('getAuthCode', (e) => {
-                // Retrieve the authCode from localStorage
-                const authCode = localStorage.getItem('authCode');
-                console.log('AuthProvider.getAuthCode - Retrieved authCode:', authCode); // Log the authCode
-                
-                // Resolve with the authCode obtained from Google Authentication
-                e.resolve({
-                    authCode: authCode,
-                    redirectUri: window.location.origin + '/index.html',
-                });
-            });
-    
-            AuthProvider.registerCommand('reAuthenticate', (e) => {
-                console.log('AuthProvider.reAuthenticate - Re-authenticating user.');
-                //document.getElementById('loginButton').click(); // simulate the login button click
-                e.resolve();
-            });
-    
-            AuthProvider.subscribe('Auth.loggedOut', () => {
-                console.log('AuthProvider - Logged out event received.');
-            });
-    
-            AuthProvider.subscribe('Auth.authError', (error) => {
-                console.error('AuthProvider - Auth error event received:', error);
-            });
-    
-            AuthProvider.ready();
-            console.log("GCadvancedsnippet.js - AuthProvider plugin ready.");
-        });
-    };
-    
+    // GCMessenger functions
     window.GCMessenger = {
         setAuthToken: function(token) {
             if (typeof Genesys === 'function') {
