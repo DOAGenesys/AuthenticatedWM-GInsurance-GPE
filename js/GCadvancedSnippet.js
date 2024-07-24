@@ -159,18 +159,8 @@ function initializeGCAdvancedSnippet() {
             Genesys("subscribe", "Journey.ready", function() {
                 console.log("GCadvancedsnippet.js - GPE Journey plugin is ready.");
             });
-    
-            // Subscribe to open actions
-            Genesys("subscribe", "Journey.qualifiedOpenAction", function(event) {
-                console.log("GCadvancedsnippet.js - Received GPE qualified open action event:", event);
-    
-                if (event.data.openActionProperties.openActionName.startsWith("GPE and SF - ")) {
-                    console.log("GCadvancedsnippet.js - Triggering Salesforce Web Messaging...");
-                    launchSalesforceChat();
-                }
-            });
         } else {
-            console.error("GCadvancedsnippet.js - Genesys function is not available.");
+            console.error("GCadvancedsnippet.js - Journey.ready function is not available.");
         }
     }
     
