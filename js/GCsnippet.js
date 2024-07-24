@@ -29,6 +29,7 @@ function initializeGCSnippet() {
         ys.onload = function() {
             console.log("GCsnippet.js - Genesys script loaded successfully.");
             initializeGCAdvancedSnippet();
+            initializeAuthProvider();
         };
         ys.onerror = function() {
             console.error("GCsnippet.js - Failed to load Genesys script.");
@@ -268,23 +269,20 @@ function initializeGCAdvancedSnippet() {
     IdleTrack();
 }
 
-window.initializeAuthProvider = function(authCode) {
-    if (typeof Genesys === 'function') {
-        Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
-            AuthProvider.registerCommand('getAuthCode', (e) => {
-                console.log('GCsnippet.js - AuthProvider - Using authCode:', authCode);
-                
-                if (authCode) {
-                    e.resolve({
-                        authCode: authCode,
-                        redirectUri: window.location.origin + '/index.html',
-                    });
-                } else {
-                    e.reject(new Error('Auth code not available'));
-                }
-            });
+function initializeAuthProvider() {
+    Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
+        AuthProvider.registerCommand('getAuthCode', (e) => {
+            const authCode = localStorage.getItem('authCode');
+            console.log('GCsnippet.js - AuthProvider - Retrieved authCode:', authCode);
+            
+            if (authCode) {
+                e.resolve({
+                    authCode: authCode,
+                    redirectUri: window.location.origin + '/index.html',
+                });
+            } else {
+                e.reject(new Error('Auth code not found in localStorage'));
+            }
         });
-    } else {
-        console.error("GCsnippet.js - Genesys function is not available for AuthProvider initialization.");
-    }
+    });
 }
