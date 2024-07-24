@@ -4,7 +4,7 @@ if (window.initializationPromise) {
         initializeGCSnippet();
         initializeGCAdvancedSnippet();
     }).catch(error => {
-        console.error("Failed to initialize GCsnippet:", error);
+        console.error("Failed to initialize GCsnippet.js:", error);
     });
 } else {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
