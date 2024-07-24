@@ -22,7 +22,7 @@ The integration includes the following components:
 1. Create a new project in the Google Cloud Console or use an existing one.
 2. Go to credentials (https://console.cloud.google.com/apis/credentials)
 3. Configure OAuth consent screen and create OAuth 2.0 client credentials (client ID and client secret).
-4. Set up "Authorised JavaScript origins" (https://<yourSiteURL>) and Authorised redirect URIs (https://<yourSiteURL>/index.html) for your application.
+4. Set up "Authorised JavaScript origins" (https://[yourSiteURL]) and Authorised redirect URIs (https://[yourSiteURL]/index.html) for your application.
 
 ### Genesys Cloud Setup
 
