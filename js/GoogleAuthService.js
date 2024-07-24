@@ -1,5 +1,3 @@
-import jwt_decode from 'jwt-decode';
-
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
@@ -83,6 +81,12 @@ async function fetchTokens(code) {
 }
 
 async function validateIdToken(idToken) {
+    // Check if jwt_decode is available
+    if (typeof jwt_decode !== 'function') {
+        console.error('jwt_decode is not available. Make sure to include the library.');
+        throw new Error('JWT decode function is not available');
+    }
+
     const decodedToken = jwt_decode(idToken);
 
     // Check issuer
