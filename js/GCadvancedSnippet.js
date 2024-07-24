@@ -9,7 +9,19 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
-function initializeGCAdvancedSnippet() {    
+function initializeGCAdvancedSnippet() {
+
+    // GCMessenger Auth functions
+    window.GCMessenger = {
+        logout: function() {
+            if (typeof Genesys === 'function') {
+                Genesys("command", "Auth.logout");
+            } else {
+                console.error("GCadvancedsnippet.js - Auth.logout function is not available");
+            }
+        }
+    };
+    
     //cookies functions
     
     function setCookie(cname, cvalue, exdays) {
