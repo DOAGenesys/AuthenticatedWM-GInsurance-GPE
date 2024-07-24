@@ -9,6 +9,7 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
+
 function initializeGCAdvancedSnippet() {
     //authenticated messaging functions, exported through the window object, to be used in GoogleAuthService.js
     
