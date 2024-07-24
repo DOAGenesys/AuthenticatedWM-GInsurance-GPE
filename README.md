@@ -1,6 +1,6 @@
 # Genesys Cloud Authenticated Web Messaging
 
-This repository contains the code and configuration guidance necessary to integrate Genesys Cloud authenticated web messaging with Google Cloud OpenID Connect for authenticated web messaging, providing a cohesive customer engagement solution that tracks user activities on a website and initiates authenticated conversations via Genesys Cloud Web Messaging.
+This repository contains the code and configuration guidance necessary to integrate Genesys Cloud authenticated web messaging with Google Cloud OpenID Connect for authenticated web messaging, providing a cohesive customer engagement solution that tracks user activities on a website (if GPE is enabled on the GC messenger config) and initiates authenticated conversations via Genesys Cloud Web Messaging.
 
 ## Overview
 
