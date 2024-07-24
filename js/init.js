@@ -1,5 +1,6 @@
 import { signIn, signOutUser, handleAuthCallback } from './GoogleAuthService.js';
 
+
 // Create a global promise for initialization
 window.initializationPromise = new Promise(async (resolve, reject) => {
     try {
