@@ -39,7 +39,7 @@ window.registerAuthProvider = function() {
             // Resolve with the authCode obtained from Google Authentication
             e.resolve({
                 authCode: authCode,
-                redirectUri: window.location.origin + '/auth-callback',
+                redirectUri: window.location.origin + '/auth-callback.html',
             });
         });
 
