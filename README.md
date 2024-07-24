@@ -40,58 +40,74 @@ The integration includes the following components:
    - `GOOGLE_CLOUD_CLIENT_ID`
    - `GOOGLE_CLOUD_CLIENT_SECRET`
 
-## Detailed Integration Process
+## Genesys Cloud & Google Cloud integration details
 
-This section provides an explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect.
+This section provides a detailed explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect, following the authorization code flow.
 
 ### Authentication Flow
 
-1. **Initialization**: 
-   - The web application loads and initializes the Genesys Cloud Web messaging.
-   - It sets up event listeners for user authentication actions.
+1. **Customer Opens Page**:
+   - The browser loads index.html and associated JavaScript files.
+   - init.js executes, creating `window.initializationPromise`.
+   - `getConfig()` fetches and sets up configuration.
+   - `start()` function in init.js is called, which initializes auth and checks for existing auth state.
 
-2. **User Authentication**:
-   - When the user initiates sign-in, the `signIn()` function in `GoogleAuthService.js` is called.
-   - This function constructs the Google OAuth 2.0 authorization URL with necessary parameters (client_id, redirect_uri, response_type, scope, state).
-   - The user is redirected to the Google sign-in page.
+2. **Authentication Request**:
+   - When the user clicks the login button, `signIn()` in GoogleAuthService.js is triggered.
+   - This function constructs the authentication request URL with client ID, scopes, and redirect URI.
 
-3. **Authorization Code Receipt**:
-   - After successful authentication, Google redirects back to your application's callback URL (/index.html) with an authorization code.
-   - The `handleAuthCallback()` function in `GoogleAuthService.js` processes this callback.
+3. **Redirect to Authentication Prompt**:
+   - `signIn()` redirects the user to Google's authentication page using `window.location.href`.
 
-4. **Token Exchange**:
-   - The `fetchTokens()` function exchanges the authorization code for Google OAuth 2.0 tokens.
-   - It sends a POST request to the Google token endpoint with the code, client ID, client secret, and redirect URI.
-   - Google responds with an ID token, access token, and optionally a refresh token.
+4. **User Logs In and Consents**:
+   - This step occurs on Google's authentication page, outside of your application code.
 
-5. **Genesys Cloud Integration**:
-   - The application stores the authorization code in localStorage.
-   - It calls `window.GCWeb messaging.setAuthToken(idToken)` to set the ID token for Genesys Cloud Web messaging.
+5. **Authorization Code Response**:
+   - After successful authentication, Google redirects back to your application.
+   - The `start()` function in init.js detects this callback.
+   - `handleAuthCallback()` in GoogleAuthService.js is called to process the response.
 
-6. **AuthProvider Setup**:
-   - The `registerAuthProvider()` function in `GCsnippet.js` sets up the AuthProvider plugin for Genesys Cloud Web messaging.
-   - It implements the `getAuthCode` and `reAuthenticate` commands required for authenticated messaging.
+6. **Send Authorization Code to Genesys Cloud**:
+   - In `handleAuthCallback()`, the auth code is extracted and stored in localStorage.
+   - `initializeAuthProvider()` in GCsnippet.js sets up the mechanism to provide this code to Genesys Cloud.
+
+7. **Exchange Code for Tokens**:
+   - This step is handled internally by Genesys Cloud.
+
+8. **Return Tokens**:
+   - This step is also handled internally by Genesys Cloud.
+
+9. **Return Genesys Cloud Authentication JWT**:
+   - While not explicitly shown in your code, this is the result of the successful authentication process.
+   - The Auth.authenticated event subscription in `setupAuthSubscriptions()` logs when this JWT is received.
 
 ### Key Components and Their Roles
 
-1. **GoogleAuthService.js**:
+1. **init.js**:
+   - Manages the initialization process of the application.
+   - Key functions:
+     - `getConfig()`: Fetches configuration from the server.
+     - `start()`: Initializes the application and handles authentication callback.
+     - `initializeAuth()`: Sets up login/logout button listeners.
+     - `checkAuthState()`: Checks if the user is authenticated on page load.
+     - `updateAuthUI()`: Updates the UI based on authentication state.
+
+2. **GoogleAuthService.js**:
    - Manages the OAuth 2.0 flow with Google.
    - Key functions:
      - `signIn()`: Initiates the Google sign-in process.
-     - `handleAuthCallback()`: Processes the authorization code from Google.
-     - `fetchTokens()`: Exchanges the authorization code for tokens.
+     - `handleAuthCallback()`: Processes the authentication callback from Google.
+     - `generateRandomState()`: Generates a random state for CSRF protection.
 
-2. **GCsnippet.js**:
-   - Handles the Genesys Cloud Web messaging integration.
+3. **GCsnippet.js**:
+   - Handles the Genesys Cloud Web Messaging integration.
    - Key functions:
-     - `registerAuthProvider()`: Sets up the AuthProvider plugin.
-     - `getAuthCode` command: Retrieves the stored auth code for Genesys Cloud.
-     - `reAuthenticate` command: Handles scenarios where re-authentication is needed.
+     - `initializeGCSnippet()`: Loads the Genesys Cloud script.
+     - `initializeGCAdvancedSnippet()`: Sets up advanced Genesys Cloud features.
+     - `initializeAuthProvider()`: Registers the AuthProvider plugin with Genesys Cloud.
+     - Various event subscription functions: Handle different Genesys Cloud events.
 
-3. **index.html**:
-   - Contains the main structure of the web application.
-   - Imports and initializes both Google authentication and Genesys Cloud services.
-
+This integration demonstrates how the application seamlessly connects Google Cloud authentication with Genesys Cloud Web Messaging, providing a secure and user-friendly experience for authenticated customer interactions.
 
 ## Testing Steps
 
