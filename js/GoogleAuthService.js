@@ -43,8 +43,8 @@ export async function handleAuthCallback() {
         localStorage.setItem('authCode', code);
         localStorage.setItem('idToken', idToken);
         console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
+        console.log('GoogleAuthService_snippet.js - Storing idToken:', idToken);
     
-        
         window.GCMessenger.setAuthToken(idToken);
 
         return "Signed in successfully!";
