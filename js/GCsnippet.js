@@ -270,6 +270,7 @@ function initializeGCAdvancedSnippet() {
 }
 
 function initializeAuthProvider() {
+    console.log('GCsnippet.js - Initializing AuthProvider');
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
             const authCode = localStorage.getItem('authCode');
@@ -284,5 +285,6 @@ function initializeAuthProvider() {
                 e.reject(new Error('Auth code not found in localStorage'));
             }
         });
+        AuthProvider.ready();
     });
 }
