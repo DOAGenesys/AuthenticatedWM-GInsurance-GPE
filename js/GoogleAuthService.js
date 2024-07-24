@@ -35,13 +35,6 @@ export async function handleAuthCallback() {
     localStorage.setItem('authCode', code);
     console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
 
-    // Call initializeAuthProvider if it exists
-    if (typeof window.initializeAuthProvider === 'function') {
-        window.initializeAuthProvider(code);
-    } else {
-        console.error('GoogleAuthService_snippet.js - initializeAuthProvider function not found');
-    }
-
     return "Signed in successfully!";
 }
 
