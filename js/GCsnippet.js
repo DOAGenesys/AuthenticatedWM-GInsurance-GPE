@@ -2,6 +2,7 @@
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
         initializeGCSnippet();
+        initializeGCAdvancedSnippet();
     }).catch(error => {
         console.error("Failed to initialize GCsnippet:", error);
     });
