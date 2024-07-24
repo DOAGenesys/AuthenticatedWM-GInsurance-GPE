@@ -9,6 +9,7 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
+
 function initializeAuthProvider() {
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
