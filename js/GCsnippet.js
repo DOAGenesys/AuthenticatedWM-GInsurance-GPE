@@ -211,6 +211,7 @@ function MotorClaimType() {
     Genesys("command", "Journey.record", { eventName: "motor_claim_type" });
 }
 
+//subscribe to GPE events
 function setupJourneySubscriptions() {
     if (typeof Genesys === 'function') {
         // Subscribe to readiness
@@ -229,6 +230,53 @@ function setupJourneySubscriptions() {
         });
     } else {
         console.error("GCsnippet.js - Genesys function is not available.");
+    }
+}
+
+//subscribe to Auth events
+function setupAuthSubscriptions() {
+    if (typeof Genesys === 'function') {
+        // Auth.ready event
+        Genesys("subscribe", "Auth.ready", function() {
+            console.log("GCsnippet.js - Auth plugin is ready.");
+        });
+
+        // Auth.authenticating event
+        Genesys("subscribe", "Auth.authenticating", function(event) {
+            console.log("GCsnippet.js - Authenticating. Auth Code:", event.data.authCode, "Redirect URI:", event.data.redirectUri);
+        });
+
+        // Auth.authenticated event
+        Genesys("subscribe", "Auth.authenticated", function(event) {
+            console.log("GCsnippet.js - Authenticated. JWT received.", "Refresh Token available:", !!event.data.refreshToken);
+        });
+
+        // Auth.loggedOut event
+        Genesys("subscribe", "Auth.loggedOut", function(event) {
+            console.log("GCsnippet.js - Logged out.", "Status:", event.data.status, "Status Text:", event.data.statusText);
+        });
+
+        Genesys("subscribe", "Auth.authError", function(event) {
+            console.error("GCsnippet.js - Auth Error:", event.data);
+        });
+
+        Genesys("subscribe", "Auth.tokenError", function(event) {
+            console.error("GCsnippet.js - Token Error:", event.data);
+        });
+
+        Genesys("subscribe", "Auth.authProviderError", function() {
+            console.error("GCsnippet.js - Auth Provider Error");
+        });
+
+        Genesys("subscribe", "Auth.error", function(event) {
+            console.error("GCsnippet.js - General Auth Error:", event.data);
+        });
+
+        Genesys("subscribe", "Auth.logoutError", function(event) {
+            console.error("GCsnippet.js - Logout Error:", event.data);
+        });
+    } else {
+        console.error("GCsnippet.js - Genesys function is not available for Auth subscriptions.");
     }
 }
 
@@ -252,6 +300,7 @@ if (typeof Genesys === 'function') {
 }
 
 setupJourneySubscriptions();
+setupAuthSubscriptions();
 FormTrack();
 ButtonClickTrack();
 IdleTrack();
