@@ -1,5 +1,33 @@
 import { signIn, signOutUser, handleAuthCallback } from './GoogleAuthService.js';
 
+// Create a global promise for initialization
+window.initializationPromise = new Promise(async (resolve, reject) => {
+    try {
+        console.log("Initialization started.");
+        const config = await getConfig();
+        setWindowConfig(config);
+        
+        console.log("Configuration set. Verifying...");
+        
+        if (!window.GoogleCloudClientId || !window.GoogleCloudClientSecret) {
+            throw new Error("Google Cloud configuration is incomplete");
+        }
+        
+        console.log("Google Cloud configuration verified.");
+
+        if (!config.GCDomain || !config.GCEnvironment || !config.GCMessagingDeplId) {
+            throw new Error("GC configuration is incomplete");
+        }
+        console.log("GC configuration verified.");
+
+        console.log("Initialization completed successfully.");
+        resolve();
+    } catch (error) {
+        console.error("Initialization failed:", error);
+        reject(error);
+    }
+});
+
 async function getConfig() {
     console.log("Attempting to fetch configuration...");
     try {
@@ -24,28 +52,6 @@ function setWindowConfig(config) {
 async function start() {
     try {
         console.log("Start function initiated.");
-        const config = await getConfig();
-        setWindowConfig(config);
-        
-        console.log("Configuration set. Verifying...");
-        
-        if (!window.GoogleCloudClientId) {
-            throw new Error("Google Cloud Client Id is not set");
-        }
-        if (!window.GoogleCloudClientSecret) {
-            throw new Error("Google Cloud Client Secret is not set");
-        }
-        
-        console.log("Google Cloud configuration verified.");
-
-        console.log("GCDomain:", config.GCDomain);
-        console.log("GCEnvironment:", config.GCEnvironment);
-        console.log("GCMessagingDeplId:", config.GCMessagingDeplId);
-
-        if (!config.GCDomain || !config.GCEnvironment || !config.GCMessagingDeplId) {
-            throw new Error("GC configuration is incomplete");
-        }
-        console.log("GC configuration verified.");
         
         console.log("Initializing auth...");
         initializeAuth();
@@ -153,7 +159,10 @@ function updateAuthUI(isAuthenticated) {
     console.log("Auth UI updated.");
 }
 
-console.log("Script loaded. Starting initialization...");
-start().catch(error => {
-    console.error("Failed to complete start function:", error);
+// Wait for initialization to complete before starting the application
+window.initializationPromise.then(() => {
+    console.log("Initialization promise resolved. Starting application...");
+    start();
+}).catch(error => {
+    console.error("Failed to initialize:", error);
 });
