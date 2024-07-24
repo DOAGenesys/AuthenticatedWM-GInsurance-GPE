@@ -14,6 +14,7 @@ export async function signIn() {
     window.location.href = `${GOOGLE_AUTH_URL}?${params.toString()}`;
 }
 
+
 export async function handleAuthCallback() {
     await window.initializationPromise;  
     const urlParams = new URLSearchParams(window.location.search);
