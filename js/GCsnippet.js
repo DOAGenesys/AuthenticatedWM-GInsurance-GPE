@@ -253,7 +253,7 @@ function initializeGCAdvancedSnippet() {
             Genesys("command", "Database.set", {
                 messaging: {
                     customAttributes: {
-                        ID: username || "Unknown",
+                        ID: username,
                         browser_language: navigator.language || "Unknown",
                         vertical: "insurance",
                         language: "english"
