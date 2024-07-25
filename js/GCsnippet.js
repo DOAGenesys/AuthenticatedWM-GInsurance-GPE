@@ -208,27 +208,15 @@ function initializeGCAdvancedSnippet() {
             Genesys("subscribe", "Auth.authenticating", function(event) {
                 console.log("GCsnippet.js - Authenticating. Auth Code:", event.data.authCode, "Redirect URI:", event.data.redirectUri);
             });
-    
+
             // Auth.authenticated event
-            Genesys("subscribe", "Auth.authenticated", async function(event) {
-                console.log("GCsnippet.js - Authenticated. JWT received.", "Refresh Token available:", !!event.data.refreshToken);
-                
-                try {
-                    // Check if the function is available on the GoogleAuthService object
-                    if (window.GoogleAuthService && typeof window.GoogleAuthService.fetchAndProcessToken === 'function') {
-                        const userInfo = await window.GoogleAuthService.fetchAndProcessToken();
-                        setCustomAttributes(userInfo);
-                    } else {
-                        throw new Error('fetchAndProcessToken function is not available');
-                    }
-                } catch (error) {
-                    console.error("GCsnippet.js - Error processing token after authentication:", error);
-                }
+            Genesys("subscribe", "Auth.authenticated", function(event) {
+                console.log("GCsnippet.js - Authenticated. JWT received.", "Data:", event.data);
             });
     
             // Auth.loggedOut event
             Genesys("subscribe", "Auth.loggedOut", function(event) {
-                console.log("GCsnippet.js - Logged out.", "Status:", event.data.status, "Status Text:", event.data.statusText);
+                console.log("GCsnippet.js - Logged out.", "Data:", event.data);
             });
     
             Genesys("subscribe", "Auth.authError", function(event) {
