@@ -1,7 +1,7 @@
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
-window.GoogleAuthService = window.GoogleAuthService || {};
+window.GoogleAuthService = {};
 
 export async function signIn() {
     await window.initializationPromise;  
@@ -121,5 +121,12 @@ function generateRandomState() {
     return state;
 }
 
+window.GoogleAuthService.signIn = signIn;
+window.GoogleAuthService.handleAuthCallback = handleAuthCallback;
 window.GoogleAuthService.fetchAndProcessToken = fetchAndProcessToken;
-console.log('GoogleAuthService_snippet.js - fetchAndProcessToken available:', !!window.GoogleAuthService.fetchAndProcessToken);
+
+console.log('GoogleAuthService_snippet.js - GoogleAuthService loaded, functions available:', {
+    signIn: !!window.GoogleAuthService.signIn,
+    handleAuthCallback: !!window.GoogleAuthService.handleAuthCallback,
+    fetchAndProcessToken: !!window.GoogleAuthService.fetchAndProcessToken
+});
