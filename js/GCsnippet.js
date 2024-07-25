@@ -287,7 +287,7 @@ function initializeAuthProvider() {
     console.log('GCsnippet.js - Initializing AuthProvider');
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
         AuthProvider.registerCommand('getAuthCode', (e) => {
-            const authCode = localStorage.getItem('authCode');
+            const authCode = localStorage.getItem('id_token');
             console.log('GCsnippet.js - AuthProvider - Retrieved authCode:', authCode);
             
             if (authCode) {
