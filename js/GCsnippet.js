@@ -214,8 +214,13 @@ function initializeGCAdvancedSnippet() {
                 console.log("GCsnippet.js - Authenticated. JWT received.", "Refresh Token available:", !!event.data.refreshToken);
                 
                 try {
-                    const userInfo = await window.fetchAndProcessToken();
-                    setCustomAttributes(userInfo);
+                    // Check if the function is available on the GoogleAuthService object
+                    if (window.GoogleAuthService && typeof window.GoogleAuthService.fetchAndProcessToken === 'function') {
+                        const userInfo = await window.GoogleAuthService.fetchAndProcessToken();
+                        setCustomAttributes(userInfo);
+                    } else {
+                        throw new Error('fetchAndProcessToken function is not available');
+                    }
                 } catch (error) {
                     console.error("GCsnippet.js - Error processing token after authentication:", error);
                 }
