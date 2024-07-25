@@ -58,51 +58,48 @@ export async function handleAuthCallback() {
     console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
 
     try {
-        const tokenInfo = await fetchIdToken(code);
-        console.log('GoogleAuthService_snippet.js - Token info:', tokenInfo);
-        
-        // Store relevant user information, see https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo
-        if (tokenInfo.email) localStorage.setItem('userEmail', tokenInfo.email);
-        if (tokenInfo.name) localStorage.setItem('userName', tokenInfo.name);
-        if (tokenInfo.picture) localStorage.setItem('userPicture', tokenInfo.picture);
+        const tokenData = await fetchToken(code);
+        console.log('GoogleAuthService_snippet.js - Token data received:', tokenData);
+
+        if (!tokenData.id_token) {
+            throw new Error('No ID token found in the response');
+        }
+
+        const decodedToken = decodeJWT(tokenData.id_token);
+        console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
+
+        // Store relevant user information
+        if (decodedToken.email) localStorage.setItem('userEmail', decodedToken.email);
+        if (decodedToken.name) localStorage.setItem('userName', decodedToken.name);
+        if (decodedToken.picture) localStorage.setItem('userPicture', decodedToken.picture);
         
     } catch (error) {
-        console.error('GoogleAuthService_snippet.js - Error fetching ID token:', error);
+        console.error('GoogleAuthService_snippet.js - Error fetching or processing token:', error);
     }
 
     return "Signed in successfully!";
 }
 
-async function fetchIdToken(code) {
-    const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
+async function fetchToken(code) {
+    await window.initializationPromise;  
+    const response = await fetch(GOOGLE_TOKEN_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-            code: code,
+            code,
             client_id: window.GoogleCloudClientId,
             client_secret: window.GoogleCloudClientSecret,
             redirect_uri: window.location.origin + '/index.html',
             grant_type: 'authorization_code',
         }),
     });
-
-    if (!tokenResponse.ok) {
-        throw new Error(`HTTP error! status: ${tokenResponse.status}`);
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to fetch tokens: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`);
     }
-
-    const tokenData = await tokenResponse.json();
-    console.log('GoogleAuthService_snippet.js - Token data received:', tokenData);
-
-    if (!tokenData.id_token) {
-        throw new Error('No ID token found in the response');
-    }
-
-    const decodedToken = decodeJWT(tokenData.id_token);
-    console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
-
-    return decodedToken;
+    return response.json();
 }
 
 function generateRandomState() {
