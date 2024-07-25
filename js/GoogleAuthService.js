@@ -1,4 +1,5 @@
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 export async function signIn() {
     await window.initializationPromise;  
@@ -13,11 +14,22 @@ export async function signIn() {
     window.location.href = `${GOOGLE_AUTH_URL}?${params.toString()}`;
 }
 
+function decodeJWT(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
 export async function handleAuthCallback() {
     await window.initializationPromise;  
     
     const fullUrl = window.location.href;
     console.log('GoogleAuthService_snippet.js - Full callback URL:', fullUrl);
+
     const url = new URL(fullUrl);
     const urlParams = new URLSearchParams(url.search);
 
@@ -28,9 +40,8 @@ export async function handleAuthCallback() {
 
     const code = urlParams.get('code');
     const state = urlParams.get('state');
-    const email = urlParams.get('email') || urlParams.get('mail');
 
-    console.log('GoogleAuthService_snippet.js - Extracted Parameters:', { code, state, email });
+    console.log('GoogleAuthService_snippet.js - Extracted Parameters:', { code, state });
 
     if (!code || !state) {
         throw new Error('No code or state found in the URL');
@@ -46,15 +57,51 @@ export async function handleAuthCallback() {
     localStorage.setItem('authCode', code);
     console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
 
-    // Store the email if it's available
-    if (email) {
-        localStorage.setItem('userEmail', email);
-        console.log('GoogleAuthService_snippet.js - Storing userEmail:', email);
-    } else {
-        console.log('GoogleAuthService_snippet.js - No email found in URL parameters');
+    try {
+        const tokenInfo = await fetchIdToken(code);
+        console.log('GoogleAuthService_snippet.js - Token info:', tokenInfo);
+        
+        // Store relevant user information, see https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo
+        if (tokenInfo.email) localStorage.setItem('userEmail', tokenInfo.email);
+        if (tokenInfo.name) localStorage.setItem('userName', tokenInfo.name);
+        
+    } catch (error) {
+        console.error('GoogleAuthService_snippet.js - Error fetching ID token:', error);
     }
 
     return "Signed in successfully!";
+}
+
+async function fetchIdToken(code) {
+    const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            code: code,
+            client_id: window.GoogleCloudClientId,
+            client_secret: window.GoogleCloudClientSecret,
+            redirect_uri: window.location.origin + '/index.html',
+            grant_type: 'authorization_code',
+        }),
+    });
+
+    if (!tokenResponse.ok) {
+        throw new Error(`HTTP error! status: ${tokenResponse.status}`);
+    }
+
+    const tokenData = await tokenResponse.json();
+    console.log('GoogleAuthService_snippet.js - Token data received:', tokenData);
+
+    if (!tokenData.id_token) {
+        throw new Error('No ID token found in the response');
+    }
+
+    const decodedToken = decodeJWT(tokenData.id_token);
+    console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
+
+    return decodedToken;
 }
 
 function generateRandomState() {
