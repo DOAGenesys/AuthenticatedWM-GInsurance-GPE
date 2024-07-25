@@ -244,26 +244,16 @@ function initializeGCAdvancedSnippet() {
     }
 
     function setCustomAttributes(userInfo) {
-        // Retrieve user information from localStorage
-        const userEmail = localStorage.getItem('userEmail');
-        const userName = localStorage.getItem('userName');
-        const userPicture = localStorage.getItem('userPicture');
         const username = getCookie("username") || "";
     
         console.log('GCsnippet.js - User information:');
-        console.log('  Email:', userEmail || "Not set");
-        console.log('  Name:', userName || "Not set");
-        console.log('  Picture URL:', userPicture || "Not set");
         console.log('  Cookie username:', username || "Not set");
         
         if (typeof Genesys === 'function') {
             Genesys("command", "Database.set", {
                 messaging: {
                     customAttributes: {
-                        ID: userInfo.email || userInfo.sub || "Unknown",
-                        name: userInfo.name || "Unknown",
-                        email: userInfo.email || "Unknown",
-                        picture_url: userInfo.picture || "Unknown",
+                        ID: username || "Unknown",
                         browser_language: navigator.language || "Unknown",
                         vertical: "insurance",
                         language: "english"
