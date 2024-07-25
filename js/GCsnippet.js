@@ -1,5 +1,3 @@
-import { fetchAndProcessToken } from './GoogleAuthService.js';
-
 // Wait for initialization before running the script
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
@@ -216,7 +214,7 @@ function initializeGCAdvancedSnippet() {
                 console.log("GCsnippet.js - Authenticated. JWT received.", "Refresh Token available:", !!event.data.refreshToken);
                 
                 try {
-                    const userInfo = await fetchAndProcessToken();
+                    const userInfo = await window.fetchAndProcessToken();
                     setCustomAttributes(userInfo);
                 } catch (error) {
                     console.error("GCsnippet.js - Error processing token after authentication:", error);
