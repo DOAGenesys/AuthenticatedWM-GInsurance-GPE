@@ -65,6 +65,7 @@ export async function handleAuthCallback() {
             throw new Error('No ID token found in the response');
         }
 
+        if (tokenData.id_token) localStorage.setItem('id_token', tokenData.id_token);
         const decodedToken = decodeJWT(tokenData.id_token);
         console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
 
