@@ -1,3 +1,5 @@
+import { fetchAndProcessToken } from './GoogleAuthService.js';
+
 // Wait for initialization before running the script
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
