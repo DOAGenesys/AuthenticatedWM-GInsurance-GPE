@@ -62,7 +62,7 @@ export async function handleAuthCallback() {
     return "Auth code stored successfully!";
 }
 
-export async function fetchAndProcessToken() {
+async function fetchAndProcessToken() {
     const code = localStorage.getItem('authCode');
     if (!code) {
         throw new Error('No auth code found in localStorage');
