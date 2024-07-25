@@ -243,23 +243,33 @@ function initializeGCAdvancedSnippet() {
         }
     }
     
-    console.log('GCsnippet.js - Customer email address is ', window.customerEmail || "Not set");
-    let userEmail = localStorage.getItem('userEmail');
-    let username = getCookie("username") || "";
-    console.log('GCsnippet.js - User email from localStorage:', userEmail);
-    console.log('GCsnippet.js - Cookie customer email address is ', username);
-    
+// Retrieve user information from localStorage
+    const userEmail = localStorage.getItem('userEmail');
+    const userName = localStorage.getItem('userName');
+    const userPicture = localStorage.getItem('userPicture');
+    const username = getCookie("username") || "";
+
+    console.log('GCsnippet.js - User information:');
+    console.log('  Email:', userEmail || "Not set");
+    console.log('  Name:', userName || "Not set");
+    console.log('  Picture URL:', userPicture || "Not set");
+    console.log('  Cookie username:', username || "Not set");
+
     if (typeof Genesys === 'function') {
         Genesys("command", "Database.set", {
             messaging: {
                 customAttributes: {
                     ID: userEmail || username || "Unknown",
+                    name: userName || "Unknown",
+                    email: userEmail || "Unknown",
+                    picture_url: userPicture || "Unknown",
                     browser_language: navigator.language || "Unknown",
                     vertical: "insurance",
                     language: "english"
                 }
             }
         });
+        console.log('GCsnippet.js - Custom attributes set for Genesys');
     } else {
         console.error("GCsnippet.js - Genesys function is not available.");
     }
