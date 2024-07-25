@@ -1,6 +1,8 @@
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
+window.GoogleAuthService = window.GoogleAuthService || {};
+
 export async function signIn() {
     await window.initializationPromise;  
     const params = new URLSearchParams({
@@ -95,3 +97,5 @@ function generateRandomState() {
     localStorage.setItem('oauth_state', state);
     return state;
 }
+
+window.GoogleAuthService.fetchAndProcessToken = fetchAndProcessToken;
