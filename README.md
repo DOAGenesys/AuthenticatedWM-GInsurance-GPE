@@ -67,19 +67,26 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
    - The `start()` function in init.js detects this callback.
    - `handleAuthCallback()` in GoogleAuthService.js is called to process the response.
 
-6. **Send Authorization Code to Genesys Cloud**:
-   - In `handleAuthCallback()`, the auth code is extracted and stored in localStorage.
-   - `initializeAuthProvider()` in GCsnippet.js sets up the mechanism to provide this code to Genesys Cloud.
+6. **Exchange Code for Tokens**:
+   - The `fetchIdToken()` function in GoogleAuthService.js sends a POST request to Google's token endpoint.
+   - This request includes the authorization code, client ID, client secret, and redirect URI.
+   - Google responds with an access token, ID token, and optionally a refresh token.
 
-7. **Exchange Code for Tokens**:
-   - This step is handled internally by Genesys Cloud.
+7. **Obtain User Information from ID Token**:
+   - The ID token is a JWT (JSON Web Token) containing user information.
+   - The `decodeJWT()` function in GoogleAuthService.js decodes the ID token.
+   - User information such as email, name, and picture URL are extracted from the decoded token.
 
-8. **Return Tokens**:
-   - This step is also handled internally by Genesys Cloud.
+8. **Store User Information**:
+   - Relevant user information (email, name, picture URL) is stored in localStorage.
+   - This information is later used by GCsnippet.js to set custom attributes for Genesys Cloud.
 
-9. **Return Genesys Cloud Authentication JWT**:
-   - While not explicitly shown in your code, this is the result of the successful authentication process.
-   - The Auth.authenticated event subscription in `setupAuthSubscriptions()` logs when this JWT is received.
+9. **Send Authorization Code to Genesys Cloud**:
+   - `initializeAuthProvider()` in GCsnippet.js sets up the mechanism to provide the authorization code to Genesys Cloud.
+
+10. **Return Genesys Cloud Authentication JWT**:
+    - Genesys Cloud internally exchanges the authorization code for its own JWT.
+    - The Auth.authenticated event subscription in `setupAuthSubscriptions()` logs when this JWT is received.
 
 ### Key Components and Their Roles
 
@@ -97,7 +104,8 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
    - Key functions:
      - `signIn()`: Initiates the Google sign-in process.
      - `handleAuthCallback()`: Processes the authentication callback from Google.
-     - `generateRandomState()`: Generates a random state for CSRF protection.
+     - `fetchIdToken()`: Exchanges the authorization code for tokens.
+     - `decodeJWT()`: Decodes the ID token to extract user information.
 
 3. **GCsnippet.js**:
    - Handles the Genesys Cloud Web Messaging integration.
@@ -105,7 +113,7 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
      - `initializeGCSnippet()`: Loads the Genesys Cloud script.
      - `initializeGCAdvancedSnippet()`: Sets up advanced Genesys Cloud features.
      - `initializeAuthProvider()`: Registers the AuthProvider plugin with Genesys Cloud.
-     - Various event subscription functions: Handle different Genesys Cloud events.
+     - Sets custom attributes for Genesys Cloud using user information from the ID token.
 
 This integration demonstrates how the application seamlessly connects Google Cloud authentication with Genesys Cloud Web Messaging, providing a secure and user-friendly experience for authenticated customer interactions.
 
@@ -114,10 +122,12 @@ This integration demonstrates how the application seamlessly connects Google Clo
 1. Clear browsing data on your browser.
 2. Log in using Google authentication when prompted.
 3. Observe the Genesys Cloud Web messaging widget; it should be triggered shortly after the user is authenticated.
+4. Check the browser console for logs showing the extracted user information from the ID token.
+5. Verify that the custom attributes in Genesys Cloud include the user's email, name, and other relevant information.
 
 ## Debug
 
-Open the browser developer console and filter by "snippet.js" to see debugging for both Genesys Cloud and Google authentication code snippets.
+Open the browser developer console and filter by "snippet.js" or "GoogleAuthService" to see debugging for both Genesys Cloud and Google authentication code snippets. Look for logs indicating successful token exchange and ID token decoding.
 
 ## Troubleshooting
 
@@ -125,5 +135,8 @@ If you encounter any issues during setup or testing:
 
 1. Ensure all environment variables are correctly set in your Vercel project.
 2. Verify that the Google Cloud OAuth credentials are correctly configured with the appropriate redirect URIs.
-3. Check the browser console for any error messages related to authentication or Genesys Cloud integration.
+3. Check the browser console for any error messages related to authentication, token exchange, or ID token decoding.
 4. Confirm that the Genesys Cloud Web messaging deployment is properly configured for authenticated messaging.
+5. If user information is not being extracted correctly, ensure that the necessary scopes (e.g., 'email', 'profile') are requested in your Google OAuth configuration.
+6. Verify that the `fetchIdToken()` function is successfully exchanging the authorization code for tokens.
+7. If custom attributes are not being set in Genesys Cloud, check the logs in GCsnippet.js to ensure user information is being retrieved from localStorage correctly.
