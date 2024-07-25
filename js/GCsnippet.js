@@ -244,14 +244,16 @@ function initializeGCAdvancedSnippet() {
     }
     
     console.log('GCsnippet.js - Customer email address is ', window.customerEmail || "Not set");
+    let userEmail = localStorage.getItem('userEmail');
     let username = getCookie("username") || "";
+    console.log('GCsnippet.js - User email from localStorage:', userEmail);
     console.log('GCsnippet.js - Cookie customer email address is ', username);
     
     if (typeof Genesys === 'function') {
         Genesys("command", "Database.set", {
             messaging: {
                 customAttributes: {
-                    ID: username || "Unknown",
+                    ID: userEmail || username || "Unknown",
                     browser_language: navigator.language || "Unknown",
                     vertical: "insurance",
                     language: "english"
