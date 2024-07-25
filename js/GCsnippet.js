@@ -269,6 +269,8 @@ function initializeGCAdvancedSnippet() {
     IdleTrack();
 }
 
+//required for authenticated web messaging (https://developer.genesys.cloud/commdigital/digital/webmessaging/messengersdk/authenticatedMessenger)
+
 function initializeAuthProvider() {
     console.log('GCsnippet.js - Initializing AuthProvider');
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
