@@ -210,8 +210,15 @@ function initializeGCAdvancedSnippet() {
             });
     
             // Auth.authenticated event
-            Genesys("subscribe", "Auth.authenticated", function(event) {
+            Genesys("subscribe", "Auth.authenticated", async function(event) {
                 console.log("GCsnippet.js - Authenticated. JWT received.", "Refresh Token available:", !!event.data.refreshToken);
+                
+                try {
+                    const userInfo = await fetchAndProcessToken();
+                    setCustomAttributes(userInfo);
+                } catch (error) {
+                    console.error("GCsnippet.js - Error processing token after authentication:", error);
+                }
             });
     
             // Auth.loggedOut event
@@ -242,36 +249,38 @@ function initializeGCAdvancedSnippet() {
             console.error("GCsnippet.js - Genesys function is not available for Auth subscriptions.");
         }
     }
+
+    function setCustomAttributes(userInfo) {
+        // Retrieve user information from localStorage
+        const userEmail = localStorage.getItem('userEmail');
+        const userName = localStorage.getItem('userName');
+        const userPicture = localStorage.getItem('userPicture');
+        const username = getCookie("username") || "";
     
-// Retrieve user information from localStorage
-    const userEmail = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-    const userPicture = localStorage.getItem('userPicture');
-    const username = getCookie("username") || "";
-
-    console.log('GCsnippet.js - User information:');
-    console.log('  Email:', userEmail || "Not set");
-    console.log('  Name:', userName || "Not set");
-    console.log('  Picture URL:', userPicture || "Not set");
-    console.log('  Cookie username:', username || "Not set");
-
-    if (typeof Genesys === 'function') {
-        Genesys("command", "Database.set", {
-            messaging: {
-                customAttributes: {
-                    ID: userEmail || username || "Unknown",
-                    name: userName || "Unknown",
-                    email: userEmail || "Unknown",
-                    picture_url: userPicture || "Unknown",
-                    browser_language: navigator.language || "Unknown",
-                    vertical: "insurance",
-                    language: "english"
+        console.log('GCsnippet.js - User information:');
+        console.log('  Email:', userEmail || "Not set");
+        console.log('  Name:', userName || "Not set");
+        console.log('  Picture URL:', userPicture || "Not set");
+        console.log('  Cookie username:', username || "Not set");
+        
+        if (typeof Genesys === 'function') {
+            Genesys("command", "Database.set", {
+                messaging: {
+                    customAttributes: {
+                        ID: userInfo.email || userInfo.sub || "Unknown",
+                        name: userInfo.name || "Unknown",
+                        email: userInfo.email || "Unknown",
+                        picture_url: userInfo.picture || "Unknown",
+                        browser_language: navigator.language || "Unknown",
+                        vertical: "insurance",
+                        language: "english"
+                    }
                 }
-            }
-        });
-        console.log('GCsnippet.js - Custom attributes set for Genesys');
-    } else {
-        console.error("GCsnippet.js - Genesys function is not available.");
+            });
+            console.log('GCsnippet.js - Custom attributes set for Genesys');
+        } else {
+            console.error("GCsnippet.js - Genesys function is not available.");
+        }
     }
     
     setupJourneySubscriptions();
