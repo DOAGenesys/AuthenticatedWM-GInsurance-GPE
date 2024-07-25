@@ -15,8 +15,12 @@ export async function signIn() {
 
 export async function handleAuthCallback() {
     await window.initializationPromise;  
-    const urlParams = new URLSearchParams(window.location.search);
     
+    const fullUrl = window.location.href;
+    console.log('GoogleAuthService_snippet.js - Full callback URL:', fullUrl);
+    const url = new URL(fullUrl);
+    const urlParams = new URLSearchParams(url.search);
+
     console.log('GoogleAuthService_snippet.js - URL Parameters from Google:');
     for (const [key, value] of urlParams) {
         console.log(`  ${key}: ${value}`);
@@ -24,7 +28,6 @@ export async function handleAuthCallback() {
 
     const code = urlParams.get('code');
     const state = urlParams.get('state');
-    
     const email = urlParams.get('email') || urlParams.get('mail');
 
     console.log('GoogleAuthService_snippet.js - Extracted Parameters:', { code, state, email });
