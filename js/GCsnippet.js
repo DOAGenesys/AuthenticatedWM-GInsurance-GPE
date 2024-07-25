@@ -243,7 +243,7 @@ function initializeGCAdvancedSnippet() {
         }
     }
 
-    function setCustomAttributes(userInfo) {
+    function setCustomAttributes() {
         const username = getCookie("username") || "";
     
         console.log('GCsnippet.js - User information:');
@@ -271,6 +271,7 @@ function initializeGCAdvancedSnippet() {
     FormTrack();
     ButtonClickTrack();
     IdleTrack();
+    setCustomAttributes();
 }
 
 //required for authenticated web messaging (https://developer.genesys.cloud/commdigital/digital/webmessaging/messengersdk/authenticatedMessenger)
