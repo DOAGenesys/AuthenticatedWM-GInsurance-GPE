@@ -64,6 +64,7 @@ export async function handleAuthCallback() {
         // Store relevant user information, see https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo
         if (tokenInfo.email) localStorage.setItem('userEmail', tokenInfo.email);
         if (tokenInfo.name) localStorage.setItem('userName', tokenInfo.name);
+        if (tokenInfo.picture) localStorage.setItem('userPicture', tokenInfo.picture);
         
     } catch (error) {
         console.error('GoogleAuthService_snippet.js - Error fetching ID token:', error);
