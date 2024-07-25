@@ -44,7 +44,7 @@ The integration includes the following components:
 
 This section provides a detailed explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect, following the authorization code flow.
 
-### Authentication Flow
+### Authentication Flow (see https://developer.genesys.cloud/commdigital/digital/webmessaging/authenticate)
 
 1. **Customer Opens Page**:
    - The browser loads index.html and associated JavaScript files.
