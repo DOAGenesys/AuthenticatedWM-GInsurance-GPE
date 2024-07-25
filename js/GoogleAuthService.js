@@ -1,5 +1,4 @@
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 window.GoogleAuthService = {};
 
@@ -62,59 +61,6 @@ export async function handleAuthCallback() {
     return "Auth code stored successfully!";
 }
 
-async function fetchToken(code) {
-    const response = await fetch(GOOGLE_TOKEN_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            code,
-            client_id: window.GoogleCloudClientId,
-            client_secret: window.GoogleCloudClientSecret,
-            redirect_uri: window.location.origin + '/index.html',
-            grant_type: 'authorization_code',
-        }),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to fetch tokens: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`);
-    }
-
-    return response.json();
-}
-
-async function fetchAndProcessToken() {
-    const code = localStorage.getItem('authCode');
-    if (!code) {
-        throw new Error('No auth code found in localStorage');
-    }
-
-    try {
-        const tokenData = await fetchToken(code);
-        console.log('GoogleAuthService_snippet.js - Token data received:', tokenData);
-
-        if (!tokenData.id_token) {
-            throw new Error('No ID token found in the response');
-        }
-
-        localStorage.setItem('id_token', tokenData.id_token);
-        const decodedToken = decodeJWT(tokenData.id_token);
-        console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
-
-        // Store relevant user information
-        if (decodedToken.email) localStorage.setItem('userEmail', decodedToken.email);
-        if (decodedToken.name) localStorage.setItem('userName', decodedToken.name);
-        if (decodedToken.picture) localStorage.setItem('userPicture', decodedToken.picture);
-
-        return decodedToken;
-    } catch (error) {
-        console.error('GoogleAuthService_snippet.js - Error fetching or processing token:', error);
-        throw error;
-    }
-}
-
 function generateRandomState() {
     const state = Math.random().toString(36).substring(2, 15);
     localStorage.setItem('oauth_state', state);
@@ -123,10 +69,8 @@ function generateRandomState() {
 
 window.GoogleAuthService.signIn = signIn;
 window.GoogleAuthService.handleAuthCallback = handleAuthCallback;
-window.GoogleAuthService.fetchAndProcessToken = fetchAndProcessToken;
 
 console.log('GoogleAuthService_snippet.js - GoogleAuthService loaded, functions available:', {
     signIn: !!window.GoogleAuthService.signIn,
-    handleAuthCallback: !!window.GoogleAuthService.handleAuthCallback,
-    fetchAndProcessToken: !!window.GoogleAuthService.fetchAndProcessToken
+    handleAuthCallback: !!window.GoogleAuthService.handleAuthCallback
 });
