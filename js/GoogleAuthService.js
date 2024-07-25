@@ -57,6 +57,15 @@ export async function handleAuthCallback() {
     localStorage.setItem('authCode', code);
     console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
 
+    return "Auth code stored successfully!";
+}
+
+export async function fetchAndProcessToken() {
+    const code = localStorage.getItem('authCode');
+    if (!code) {
+        throw new Error('No auth code found in localStorage');
+    }
+
     try {
         const tokenData = await fetchToken(code);
         console.log('GoogleAuthService_snippet.js - Token data received:', tokenData);
@@ -65,7 +74,7 @@ export async function handleAuthCallback() {
             throw new Error('No ID token found in the response');
         }
 
-        if (tokenData.id_token) localStorage.setItem('id_token', tokenData.id_token);
+        localStorage.setItem('id_token', tokenData.id_token);
         const decodedToken = decodeJWT(tokenData.id_token);
         console.log('GoogleAuthService_snippet.js - Decoded ID token:', decodedToken);
 
@@ -73,34 +82,12 @@ export async function handleAuthCallback() {
         if (decodedToken.email) localStorage.setItem('userEmail', decodedToken.email);
         if (decodedToken.name) localStorage.setItem('userName', decodedToken.name);
         if (decodedToken.picture) localStorage.setItem('userPicture', decodedToken.picture);
-        
+
+        return decodedToken;
     } catch (error) {
         console.error('GoogleAuthService_snippet.js - Error fetching or processing token:', error);
+        throw error;
     }
-
-    return "Signed in successfully!";
-}
-
-async function fetchToken(code) {
-    await window.initializationPromise;  
-    const response = await fetch(GOOGLE_TOKEN_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            code,
-            client_id: window.GoogleCloudClientId,
-            client_secret: window.GoogleCloudClientSecret,
-            redirect_uri: window.location.origin + '/index.html',
-            grant_type: 'authorization_code',
-        }),
-    });
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to fetch tokens: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`);
-    }
-    return response.json();
 }
 
 function generateRandomState() {
