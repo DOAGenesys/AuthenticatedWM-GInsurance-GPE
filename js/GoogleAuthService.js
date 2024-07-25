@@ -18,8 +18,9 @@ export async function handleAuthCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
+    const email = urlParams.get('email') || urlParams.get('mail');
 
-    console.log('GoogleAuthService_snippet.js - URL Parameters:', { code, state });
+    console.log('GoogleAuthService_snippet.js - URL Parameters:', { code, state, email });
 
     if (!code || !state) {
         throw new Error('No code or state found in the URL');
@@ -34,6 +35,14 @@ export async function handleAuthCallback() {
     // Store the authorization code for Genesys Cloud
     localStorage.setItem('authCode', code);
     console.log('GoogleAuthService_snippet.js - Storing authCode:', code);
+
+    // Store the email if it's available
+    if (email) {
+        localStorage.setItem('userEmail', email);
+        console.log('GoogleAuthService_snippet.js - Storing userEmail:', email);
+    } else {
+        console.log('GoogleAuthService_snippet.js - No email found in URL parameters');
+    }
 
     return "Signed in successfully!";
 }
