@@ -16,11 +16,18 @@ export async function signIn() {
 export async function handleAuthCallback() {
     await window.initializationPromise;  
     const urlParams = new URLSearchParams(window.location.search);
+    
+    console.log('GoogleAuthService_snippet.js - URL Parameters from Google:');
+    for (const [key, value] of urlParams) {
+        console.log(`  ${key}: ${value}`);
+    }
+
     const code = urlParams.get('code');
     const state = urlParams.get('state');
+    
     const email = urlParams.get('email') || urlParams.get('mail');
 
-    console.log('GoogleAuthService_snippet.js - URL Parameters:', { code, state, email });
+    console.log('GoogleAuthService_snippet.js - Extracted Parameters:', { code, state, email });
 
     if (!code || !state) {
         throw new Error('No code or state found in the URL');
