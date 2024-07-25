@@ -44,7 +44,7 @@ The integration includes the following components:
 
 This section provides a detailed explanation of how Genesys Cloud authenticated web messaging integrates with Google Cloud OpenID Connect, following the authorization code flow.
 
-### Authentication Flow (see https://developer.genesys.cloud/commdigital/digital/webmessaging/authenticate)
+### Authentication Flow
 
 1. **Customer Opens Page**:
    - The browser loads index.html and associated JavaScript files.
@@ -68,25 +68,34 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
    - `handleAuthCallback()` in GoogleAuthService.js is called to process the response.
 
 6. **Exchange Code for Tokens**:
-   - The `fetchIdToken()` function in GoogleAuthService.js sends a POST request to Google's token endpoint.
-   - This request includes the authorization code, client ID, client secret, and redirect URI.
-   - Google responds with an access token, ID token, and optionally a refresh token.
+   - This step is automatically handled by Genesys Cloud.
+   - Genesys Cloud exchanges the authorization code for tokens with Google.
 
 7. **Obtain User Information from ID Token**:
-   - The ID token is a JWT (JSON Web Token) containing user information.
-   - The `decodeJWT()` function in GoogleAuthService.js decodes the ID token.
-   - User information such as email, name, and picture URL are extracted from the decoded token.
+   - This step is automatically handled by Genesys Cloud.
+   - Genesys Cloud decodes the ID token to extract user information.
 
 8. **Store User Information**:
-   - Relevant user information (email, name, picture URL) is stored in localStorage.
-   - This information is later used by GCsnippet.js to set custom attributes for Genesys Cloud.
+   - This step is automatically handled by Genesys Cloud.
+   - Genesys Cloud stores the relevant user information internally.
 
 9. **Send Authorization Code to Genesys Cloud**:
    - `initializeAuthProvider()` in GCsnippet.js sets up the mechanism to provide the authorization code to Genesys Cloud.
 
 10. **Return Genesys Cloud Authentication JWT**:
+    - This step is automatically handled by Genesys Cloud.
     - Genesys Cloud internally exchanges the authorization code for its own JWT.
-    - The Auth.authenticated event subscription in `setupAuthSubscriptions()` logs when this JWT is received.
+
+### Available User Information
+
+Genesys Cloud automatically extracts and uses specific claims from the ID token. According to the [Genesys Cloud documentation](https://developer.genesys.cloud/commdigital/digital/webmessaging/authenticate#required-scopes-and-used-claims-in-web-messaging), the following claims are used:
+
+- `sub`: Used as the customer's identifier
+- `email`: Used as the customer's email address
+- `given_name`: Used as the customer's first name
+- `family_name`: Used as the customer's last name
+
+These claims are used to populate the customer's information in Genesys Cloud, enabling personalized interactions without requiring additional code on the client side.
 
 ### Key Components and Their Roles
 
@@ -104,8 +113,6 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
    - Key functions:
      - `signIn()`: Initiates the Google sign-in process.
      - `handleAuthCallback()`: Processes the authentication callback from Google.
-     - `fetchIdToken()`: Exchanges the authorization code for tokens.
-     - `decodeJWT()`: Decodes the ID token to extract user information.
 
 3. **GCsnippet.js**:
    - Handles the Genesys Cloud Web Messaging integration.
