@@ -62,6 +62,29 @@ export async function handleAuthCallback() {
     return "Auth code stored successfully!";
 }
 
+async function fetchToken(code) {
+    const response = await fetch(GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            code,
+            client_id: window.GoogleCloudClientId,
+            client_secret: window.GoogleCloudClientSecret,
+            redirect_uri: window.location.origin + '/index.html',
+            grant_type: 'authorization_code',
+        }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to fetch tokens: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`);
+    }
+
+    return response.json();
+}
+
 async function fetchAndProcessToken() {
     const code = localStorage.getItem('authCode');
     if (!code) {
@@ -99,3 +122,4 @@ function generateRandomState() {
 }
 
 window.GoogleAuthService.fetchAndProcessToken = fetchAndProcessToken;
+console.log('GoogleAuthService_snippet.js - fetchAndProcessToken available:', !!window.GoogleAuthService.fetchAndProcessToken);
