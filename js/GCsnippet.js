@@ -93,7 +93,7 @@ function initializeGCAdvancedSnippet() {
       }
     }
     
-    //GPE standard events
+    //GPE commands for standard events
     
     function FormTrack() {
         console.log("GCsnippet.js - Form track");
@@ -131,7 +131,7 @@ function initializeGCAdvancedSnippet() {
         }
     }
 
-    //GPE custom events
+    //GPE commands for custom events
     
     function CardSelect() {
         console.log("GCsnippet.js - Dropdown clicked");
