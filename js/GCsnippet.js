@@ -9,8 +9,6 @@ if (window.initializationPromise) {
     console.error("Initialization promise not found. Make sure init.js is loaded first.");
 }
 
-//GPE & WM standard snippet
-
 function initializeGCSnippet() {
     (function (g, e, n, es, ys) {
         g['_genesysJs'] = e;
@@ -93,7 +91,7 @@ function initializeGCAdvancedSnippet() {
       }
     }
     
-    //GPE commands for standard events
+    //GPE functions
     
     function FormTrack() {
         console.log("GCsnippet.js - Form track");
@@ -130,8 +128,6 @@ function initializeGCAdvancedSnippet() {
             console.error("GCsnippet.js - Genesys function is not available");
         }
     }
-
-    //GPE commands for custom events
     
     function CardSelect() {
         console.log("GCsnippet.js - Dropdown clicked");
