@@ -274,8 +274,6 @@ function initializeGCAdvancedSnippet() {
     setCustomAttributes();
 }
 
-//required for authenticated web messaging (https://developer.genesys.cloud/commdigital/digital/webmessaging/messengersdk/authenticatedMessenger)
-
 function initializeAuthProvider() {
     console.log('GCsnippet.js - Initializing AuthProvider');
     Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
@@ -292,6 +290,28 @@ function initializeAuthProvider() {
                 e.reject(new Error('Auth code not found in localStorage'));
             }
         });
+        
+        // Added signIn command for step-up authentication
+        AuthProvider.registerCommand('signIn', (e) => {
+            console.log('GCsnippet.js - AuthProvider.signIn command called');
+            const authCode = localStorage.getItem('authCode');
+            if (authCode) {
+                const data = {
+                    authCode: authCode,
+                    redirectUri: window.location.origin + '/index.html'
+                };
+                AuthProvider.publish('signedIn', data);
+                e.resolve(data);
+            } else {
+                console.warn('GCsnippet.js - AuthProvider.signIn command: No authCode found. Initiating sign in process.');
+                // Trigger the Google sign in flow
+                window.GoogleAuthService.signIn();
+                const error = new Error('User not signed in yet, redirecting to sign in page.');
+                AuthProvider.publish('signInFailed', error);
+                e.reject(error);
+            }
+        });
+        
         AuthProvider.ready();
     });
 }
