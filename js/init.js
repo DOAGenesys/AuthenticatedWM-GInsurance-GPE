@@ -71,11 +71,11 @@ async function start() {
                 console.log("init_snippet.js - Auth callback processed:", message);
                 // Update UI to reflect signed-in state
                 updateAuthUI(true);
-                // Trigger Genesys Auth.getTokens command so the widget automatically becomes authenticated
+                // Trigger Genesys signIn command so that the widget is updated immediately.
                 if (typeof Genesys === 'function') {
-                    Genesys("command", "Auth.getTokens");
+                    Genesys("command", "signIn");
                 } else {
-                    console.warn("init_snippet.js - Genesys function not available for Auth.getTokens command");
+                    console.warn("init_snippet.js - Genesys function not available for signIn command");
                 }
                 // Remove the query parameters from the URL
                 window.history.replaceState({}, document.title, window.location.pathname);
