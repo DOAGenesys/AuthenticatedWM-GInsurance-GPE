@@ -1,3 +1,24 @@
+const AUTO_SIGN_IN_FLAG = '__genesysAutoSignInRequested';
+const AUTO_SIGN_IN_REASON = '__genesysAutoSignInReason';
+
+let authModuleReady = false;
+let authProviderReady = false;
+let autoSignInInProgress = false;
+let autoSignInReason = window[AUTO_SIGN_IN_REASON] || '';
+let autoSignInRequested = Boolean(window[AUTO_SIGN_IN_FLAG]);
+
+if (autoSignInRequested && !autoSignInReason) {
+    autoSignInReason = 'pre-init';
+    window[AUTO_SIGN_IN_REASON] = autoSignInReason;
+}
+
+if (!autoSignInRequested && hasStoredAuthCode()) {
+    autoSignInRequested = true;
+    autoSignInReason = 'auth-code-detected';
+    window[AUTO_SIGN_IN_FLAG] = true;
+    window[AUTO_SIGN_IN_REASON] = autoSignInReason;
+}
+
 // Wait for initialization before running the script
 if (window.initializationPromise) {
     window.initializationPromise.then(() => {
@@ -202,6 +223,8 @@ function initializeGCAdvancedSnippet() {
             // Auth.ready event
             Genesys("subscribe", "Auth.ready", function() {
                 console.log("GCsnippet.js - Auth plugin is ready.");
+                authModuleReady = true;
+                attemptAutoSignIn('Auth.ready');
             });
     
             // Auth.authenticating event
@@ -212,27 +235,35 @@ function initializeGCAdvancedSnippet() {
             // Auth.authenticated event
             Genesys("subscribe", "Auth.authenticated", function(event) {
                 console.log("GCsnippet.js - Authenticated. JWT received.", "Data:", event.data);
+                clearStoredAuthCode('authenticated');
+                setAutoSignInRequest(false);
             });
     
             // Auth.loggedOut event
             Genesys("subscribe", "Auth.loggedOut", function(event) {
                 console.log("GCsnippet.js - Logged out.", "Data:", event.data);
+                clearStoredAuthCode('loggedOut');
+                setAutoSignInRequest(false);
             });
     
             Genesys("subscribe", "Auth.authError", function(event) {
                 console.error("GCsnippet.js - Auth Error:", event.data);
+                handleAuthFailure('Auth.authError');
             });
     
             Genesys("subscribe", "Auth.tokenError", function(event) {
                 console.error("GCsnippet.js - Token Error:", event.data);
+                handleAuthFailure('Auth.tokenError');
             });
     
             Genesys("subscribe", "Auth.authProviderError", function() {
                 console.error("GCsnippet.js - Auth Provider Error");
+                handleAuthFailure('Auth.authProviderError');
             });
     
             Genesys("subscribe", "Auth.error", function(event) {
                 console.error("GCsnippet.js - General Auth Error:", event.data);
+                handleAuthFailure('Auth.error');
             });
     
             Genesys("subscribe", "Auth.logoutError", function(event) {
@@ -313,5 +344,92 @@ function initializeAuthProvider() {
         });
         
         AuthProvider.ready();
+        authProviderReady = true;
+        attemptAutoSignIn('AuthProvider.ready');
     });
 }
+
+function hasStoredAuthCode() {
+    try {
+        return Boolean(localStorage.getItem('authCode'));
+    } catch (error) {
+        console.error('GCsnippet.js - Unable to read authCode from localStorage:', error);
+        return false;
+    }
+}
+
+function clearStoredAuthCode(context) {
+    try {
+        if (localStorage.getItem('authCode')) {
+            localStorage.removeItem('authCode');
+            console.log(`GCsnippet.js - Cleared authCode (${context}).`);
+        }
+    } catch (error) {
+        console.error('GCsnippet.js - Unable to clear authCode:', error);
+    }
+}
+
+function setAutoSignInRequest(value, reason) {
+    autoSignInRequested = value;
+    window[AUTO_SIGN_IN_FLAG] = value;
+
+    if (value) {
+        autoSignInReason = reason || autoSignInReason || 'auto-signin';
+        window[AUTO_SIGN_IN_REASON] = autoSignInReason;
+    } else {
+        autoSignInReason = '';
+        delete window[AUTO_SIGN_IN_REASON];
+    }
+}
+
+function attemptAutoSignIn(origin) {
+    if (!autoSignInRequested) {
+        return;
+    }
+
+    if (!authModuleReady || !authProviderReady) {
+        return;
+    }
+
+    if (!hasStoredAuthCode()) {
+        setAutoSignInRequest(false);
+        return;
+    }
+
+    if (autoSignInInProgress) {
+        return;
+    }
+
+    if (typeof Genesys !== 'function') {
+        console.warn('GCsnippet.js - Genesys SDK not ready for auto sign-in yet.');
+        return;
+    }
+
+    autoSignInInProgress = true;
+    const reason = origin || autoSignInReason || 'auto';
+    console.log(`GCsnippet.js - Triggering Auth.signIn automatically (${reason}).`);
+
+    Genesys("command", "Auth.signIn")
+        .then(() => {
+            console.log('GCsnippet.js - Auth.signIn command dispatched.');
+        })
+        .catch(error => {
+            console.error('GCsnippet.js - Auto Auth.signIn failed:', error);
+            clearStoredAuthCode('auto-signin-error');
+            setAutoSignInRequest(false);
+        })
+        .finally(() => {
+            autoSignInInProgress = false;
+        });
+}
+
+function handleAuthFailure(context) {
+    clearStoredAuthCode(context);
+    setAutoSignInRequest(false);
+}
+
+window.triggerGenesysAutoSignIn = function(reason) {
+    const details = reason || `manual-trigger-${Date.now()}`;
+    setAutoSignInRequest(true, details);
+    attemptAutoSignIn(details);
+};
