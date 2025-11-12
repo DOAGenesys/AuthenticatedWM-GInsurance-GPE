@@ -38,8 +38,11 @@ The integration includes the following components:
    - `GC_ENVIRONMENT`: e.g., prod-euc1
    - `GC_MESSAGING_DEPLOYMENT_ID`
    - `GOOGLE_CLOUD_CLIENT_ID`
+   - `GOOGLE_OAUTH_ADDITIONAL_SCOPES` *(optional, space-separated list of extra Google scopes supported by your OAuth client configuration)*
 
 > **Security note:** The Google OAuth client secret must never be exposed in the browser. Keep it stored only within Google Cloud and Genesys Cloud configuration; this application does not read or store it.
+
+> **Google scope guidance:** Genesys recommends requesting `offline_access` when the identity provider supports that scope. Google issues refresh tokens via the `access_type=offline` and `prompt=consent` parameters instead, so this application omits the `offline_access` scope by default. If you need extra Google scopes, declare them in `GOOGLE_OAUTH_ADDITIONAL_SCOPES` using the exact values listed in the Google documentation (for example `https://www.googleapis.com/auth/user.phonenumbers.read`).
 
 ## Genesys Cloud & Google Cloud integration details
 
@@ -55,7 +58,7 @@ This section provides a detailed explanation of how Genesys Cloud authenticated 
 
 2. **Authentication Request**:
    - When the user clicks the login button, `signIn()` in GoogleAuthService.js is triggered.
-   - This function constructs the authentication request URL with client ID, scopes, and redirect URI.
+   - This function constructs the authentication request URL with client ID, scopes, and redirect URI. By default it requests the `openid email profile` scopes that Google documents for OpenID Connect. Additional Google-supported scopes can be configured through the `GOOGLE_OAUTH_ADDITIONAL_SCOPES` environment variable if your implementation requires them.
 
 3. **Redirect to Authentication Prompt**:
    - `signIn()` redirects the user to Google's authentication page using `window.location.href`.
