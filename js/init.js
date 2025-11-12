@@ -1,4 +1,10 @@
 import { signIn, handleAuthCallback } from './GoogleAuthService.js';
+import {
+    setConfig,
+    publishGenesysConfigToWindow,
+    hasGoogleClientId,
+    hasValidGenesysConfig
+} from './configStore.js';
 
 // Track auto sign-in state for Genesys messenger handoff
 if (typeof window.__genesysAutoSignInRequested === 'undefined') {
@@ -10,17 +16,18 @@ window.initializationPromise = new Promise(async (resolve, reject) => {
     try {
         console.log("init_snippet.js - Initialization started.");
         const config = await getConfig();
-        setWindowConfig(config);
+        setConfig(config);
+        publishGenesysConfigToWindow();
         
         console.log("init_snippet.js - Configuration set. Verifying...");
         
-        if (!window.GoogleCloudClientId || !window.GoogleCloudClientSecret) {
+        if (!hasGoogleClientId()) {
             throw new Error("Google Cloud configuration is incomplete");
         }
         
         console.log("init_snippet.js - Google Cloud configuration verified.");
 
-        if (!config.GCDomain || !config.GCEnvironment || !config.GCMessagingDeplId) {
+        if (!hasValidGenesysConfig()) {
             throw new Error("GC configuration is incomplete");
         }
         console.log("init_snippet.js - GC configuration verified.");
@@ -46,12 +53,6 @@ async function getConfig() {
         console.error("init_snippet.js - Error fetching config:", error);
         throw error;
     }
-}
-
-function setWindowConfig(config) {
-    Object.keys(config).forEach(key => {
-        window[key] = config[key];
-    });
 }
 
 async function start() {
