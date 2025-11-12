@@ -1,11 +1,19 @@
+import { getGoogleClientId } from './configStore.js';
+
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 
 window.GoogleAuthService = {};
 
 export async function signIn() {
-    await window.initializationPromise;  
+    await window.initializationPromise;
+    const clientId = getGoogleClientId();
+
+    if (!clientId) {
+        throw new Error('Google OAuth client configuration missing');
+    }
+
     const params = new URLSearchParams({
-        client_id: window.GoogleCloudClientId,
+        client_id: clientId,
         redirect_uri: window.location.origin + '/index.html',
         response_type: 'code',
         scope: 'openid email profile offline_access phone',
