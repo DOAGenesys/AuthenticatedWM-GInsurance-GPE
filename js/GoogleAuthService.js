@@ -8,7 +8,8 @@ export async function signIn() {
         client_id: window.GoogleCloudClientId,
         redirect_uri: window.location.origin + '/index.html',
         response_type: 'code',
-        scope: 'openid email profile',
+        scope: 'openid email profile offline_access phone',
+        access_type: 'offline',
         state: generateRandomState()
     });
 
