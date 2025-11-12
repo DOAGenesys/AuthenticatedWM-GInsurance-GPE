@@ -5,6 +5,7 @@ const MAX_AUTO_SIGN_IN_RETRIES = 6;
 
 let authModuleReady = false;
 let authProviderReady = false;
+let deploymentConfigReady = false;
 let autoSignInInProgress = false;
 let autoSignInReason = window[AUTO_SIGN_IN_REASON] || '';
 let autoSignInRequested = Boolean(window[AUTO_SIGN_IN_FLAG]);
@@ -303,10 +304,35 @@ function initializeGCAdvancedSnippet() {
     
     setupJourneySubscriptions();
     setupAuthSubscriptions();
+    subscribeToDeploymentConfig();
     FormTrack();
     ButtonClickTrack();
     IdleTrack();
     setCustomAttributes();
+}
+
+function subscribeToDeploymentConfig() {
+    if (typeof Genesys !== 'function') {
+        console.warn('GCsnippet.js - Genesys function unavailable for configuration subscription.');
+        return;
+    }
+
+    Genesys("subscribe", "GenesysJS.configurationReceived", function(event) {
+        deploymentConfigReady = true;
+        console.log('GCsnippet.js - Deployment configuration received.');
+        attemptAutoSignIn('config-ready');
+    });
+
+    try {
+        const cachedConfig = Genesys("data", "GenesysJS.deploymentConfig");
+        if (cachedConfig) {
+            deploymentConfigReady = true;
+            console.log('GCsnippet.js - Deployment configuration already available.');
+            attemptAutoSignIn('config-cached');
+        }
+    } catch (error) {
+        console.warn('GCsnippet.js - Unable to read cached deployment config:', error);
+    }
 }
 
 function initializeAuthProvider() {
@@ -394,6 +420,12 @@ function attemptAutoSignIn(origin) {
     }
 
     if (!authModuleReady || !authProviderReady) {
+        return;
+    }
+
+    if (!deploymentConfigReady) {
+        console.log('GCsnippet.js - Deployment config not ready. Waiting before auto sign-in.');
+        scheduleAutoSignInRetry('config-pending');
         return;
     }
 
