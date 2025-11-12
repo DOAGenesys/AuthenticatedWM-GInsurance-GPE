@@ -1,5 +1,10 @@
 import { signIn, handleAuthCallback } from './GoogleAuthService.js';
 
+// Track auto sign-in state for Genesys messenger handoff
+if (typeof window.__genesysAutoSignInRequested === 'undefined') {
+    window.__genesysAutoSignInRequested = false;
+}
+
 // Create a global promise for initialization
 window.initializationPromise = new Promise(async (resolve, reject) => {
     try {
@@ -71,12 +76,8 @@ async function start() {
                 console.log("init_snippet.js - Auth callback processed:", message);
                 // Update UI to reflect signed-in state
                 updateAuthUI(true);
-                // Trigger Genesys signIn command so that the widget is updated immediately.
-                if (typeof Genesys === 'function') {
-                    Genesys("command", "signIn");
-                } else {
-                    console.warn("init_snippet.js - Genesys function not available for signIn command");
-                }
+                // Trigger Genesys auto sign-in so that the widget is updated immediately.
+                requestGenesysAutoSignIn('Google auth callback processed');
                 // Remove the query parameters from the URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             } catch (error) {
@@ -98,6 +99,24 @@ function hideSpinner() {
     if (spinner) {
         spinner.classList.remove('show');
     }
+}
+
+function requestGenesysAutoSignIn(reason) {
+    const details = reason || `Auto sign-in requested at ${new Date().toISOString()}`;
+    window.__genesysAutoSignInRequested = true;
+    window.__genesysAutoSignInReason = details;
+
+    if (typeof window.triggerGenesysAutoSignIn === 'function') {
+        console.log("init_snippet.js - Triggering Genesys auto sign-in:", details);
+        window.triggerGenesysAutoSignIn(details);
+    } else {
+        console.log("init_snippet.js - Genesys auto sign-in queued until SDK is ready:", details);
+    }
+}
+
+function clearGenesysAutoSignInRequest() {
+    window.__genesysAutoSignInRequested = false;
+    delete window.__genesysAutoSignInReason;
 }
 
 function initializeAuth() {
@@ -133,6 +152,7 @@ function initializeAuth() {
                 }
                 // Clear local storage
                 localStorage.removeItem('authCode');
+                clearGenesysAutoSignInRequest();
                 updateAuthUI(false);
             } catch (error) {
                 console.error("init_snippet.js - Logout failed:", error.message);
