@@ -1,12 +1,14 @@
-import { getGoogleClientId } from './configStore.js';
+import { getGoogleClientId, getGoogleAdditionalScopes } from './configStore.js';
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const DEFAULT_SCOPES = ['openid', 'email', 'profile'];
 
 window.GoogleAuthService = {};
 
 export async function signIn() {
     await window.initializationPromise;
     const clientId = getGoogleClientId();
+    const scopes = buildScopeList();
 
     if (!clientId) {
         throw new Error('Google OAuth client configuration missing');
@@ -16,8 +18,10 @@ export async function signIn() {
         client_id: clientId,
         redirect_uri: window.location.origin + '/index.html',
         response_type: 'code',
-        scope: 'openid email profile offline_access phone',
+        scope: scopes.join(' '),
         access_type: 'offline',
+        include_granted_scopes: 'true',
+        prompt: 'consent',
         state: generateRandomState()
     });
 
@@ -83,3 +87,18 @@ console.log('GoogleAuthService_snippet.js - GoogleAuthService loaded, functions 
     signIn: !!window.GoogleAuthService.signIn,
     handleAuthCallback: !!window.GoogleAuthService.handleAuthCallback
 });
+
+function buildScopeList() {
+    const extraScopes = getGoogleAdditionalScopes();
+    const scopeSet = new Set(DEFAULT_SCOPES);
+
+    if (Array.isArray(extraScopes)) {
+        extraScopes.forEach(scope => {
+            if (scope && typeof scope === 'string') {
+                scopeSet.add(scope);
+            }
+        });
+    }
+
+    return Array.from(scopeSet);
+}
