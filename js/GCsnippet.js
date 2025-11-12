@@ -1,11 +1,15 @@
 const AUTO_SIGN_IN_FLAG = '__genesysAutoSignInRequested';
 const AUTO_SIGN_IN_REASON = '__genesysAutoSignInReason';
+const AUTO_SIGN_IN_RETRY_DELAY_MS = 1500;
+const MAX_AUTO_SIGN_IN_RETRIES = 6;
 
 let authModuleReady = false;
 let authProviderReady = false;
 let autoSignInInProgress = false;
 let autoSignInReason = window[AUTO_SIGN_IN_REASON] || '';
 let autoSignInRequested = Boolean(window[AUTO_SIGN_IN_FLAG]);
+let autoSignInRetryCount = 0;
+let autoSignInRetryTimer = null;
 
 if (autoSignInRequested && !autoSignInReason) {
     autoSignInReason = 'pre-init';
@@ -376,9 +380,11 @@ function setAutoSignInRequest(value, reason) {
     if (value) {
         autoSignInReason = reason || autoSignInReason || 'auto-signin';
         window[AUTO_SIGN_IN_REASON] = autoSignInReason;
+        resetAutoSignInRetryState();
     } else {
         autoSignInReason = '';
         delete window[AUTO_SIGN_IN_REASON];
+        resetAutoSignInRetryState();
     }
 }
 
@@ -402,30 +408,123 @@ function attemptAutoSignIn(origin) {
 
     if (typeof Genesys !== 'function') {
         console.warn('GCsnippet.js - Genesys SDK not ready for auto sign-in yet.');
+        if (autoSignInRetryCount >= MAX_AUTO_SIGN_IN_RETRIES) {
+            handleAuthFailure('sdk-not-ready');
+            return;
+        }
+        autoSignInRetryCount += 1;
+        scheduleAutoSignInRetry('sdk-not-ready');
         return;
     }
 
     autoSignInInProgress = true;
     const reason = origin || autoSignInReason || 'auto';
-    console.log(`GCsnippet.js - Triggering Auth.signIn automatically (${reason}).`);
+    console.log(`GCsnippet.js - Triggering signIn automatically (${reason}).`);
 
-    Genesys("command", "Auth.signIn")
-        .then(() => {
-            console.log('GCsnippet.js - Auth.signIn command dispatched.');
-        })
-        .catch(error => {
-            console.error('GCsnippet.js - Auto Auth.signIn failed:', error);
-            clearStoredAuthCode('auto-signin-error');
-            setAutoSignInRequest(false);
-        })
-        .finally(() => {
+    try {
+        const commandResult = Genesys("command", "signIn");
+        if (commandResult && typeof commandResult.then === 'function') {
+            commandResult
+                .then(() => {
+                    console.log('GCsnippet.js - signIn command dispatched.');
+                    autoSignInInProgress = false;
+                })
+                .catch(error => {
+                    handleAutoSignInError(error, reason);
+                });
+        } else {
+            console.log('GCsnippet.js - signIn command executed (fire-and-forget). Awaiting Auth events.');
             autoSignInInProgress = false;
-        });
+        }
+    } catch (error) {
+        handleAutoSignInError(error, reason);
+    }
 }
 
 function handleAuthFailure(context) {
     clearStoredAuthCode(context);
     setAutoSignInRequest(false);
+}
+
+function handleAutoSignInError(error, context) {
+    const errorMessage = getErrorMessage(error);
+    autoSignInInProgress = false;
+    console.error(`GCsnippet.js - Auto sign-in error (${context || 'auto'}):`, errorMessage);
+
+    if (shouldRetryAutoSignIn(error) && autoSignInRetryCount < MAX_AUTO_SIGN_IN_RETRIES) {
+        autoSignInRetryCount += 1;
+        scheduleAutoSignInRetry(`retry-${autoSignInRetryCount}`);
+        return;
+    }
+
+    handleAuthFailure('auto-signin-error');
+}
+
+function scheduleAutoSignInRetry(reason) {
+    resetAutoSignInRetryTimer();
+    const delay = AUTO_SIGN_IN_RETRY_DELAY_MS * Math.max(1, autoSignInRetryCount || 1);
+    console.warn(`GCsnippet.js - Auto sign-in retry scheduled in ${delay} ms (${reason}). Attempt ${autoSignInRetryCount}/${MAX_AUTO_SIGN_IN_RETRIES}.`);
+    autoSignInRetryTimer = setTimeout(() => {
+        autoSignInRetryTimer = null;
+        attemptAutoSignIn(reason);
+    }, delay);
+}
+
+function shouldRetryAutoSignIn(error) {
+    if (!error) {
+        return true;
+    }
+
+    const message = getErrorMessage(error).toLowerCase();
+    if (!message) {
+        return true;
+    }
+
+    const retryableTokens = [
+        'upgrade to authenticated session must be enabled',
+        'authprovider.signin command must be defined',
+        'authprovider.getauthcode',
+        'genesys function is not available',
+        'deployment not found'
+    ];
+
+    return retryableTokens.some(token => message.includes(token));
+}
+
+function getErrorMessage(error) {
+    if (!error) {
+        return '';
+    }
+
+    if (typeof error === 'string') {
+        return error;
+    }
+
+    if (error.message) {
+        return error.message;
+    }
+
+    if (error.statusText) {
+        return error.statusText;
+    }
+
+    try {
+        return JSON.stringify(error);
+    } catch {
+        return String(error);
+    }
+}
+
+function resetAutoSignInRetryState() {
+    autoSignInRetryCount = 0;
+    resetAutoSignInRetryTimer();
+}
+
+function resetAutoSignInRetryTimer() {
+    if (autoSignInRetryTimer) {
+        clearTimeout(autoSignInRetryTimer);
+        autoSignInRetryTimer = null;
+    }
 }
 
 window.triggerGenesysAutoSignIn = function(reason) {
