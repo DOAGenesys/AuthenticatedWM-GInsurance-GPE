@@ -451,21 +451,21 @@ function attemptAutoSignIn(origin) {
 
     autoSignInInProgress = true;
     const reason = origin || autoSignInReason || 'auto';
-    console.log(`GCsnippet.js - Triggering signIn automatically (${reason}).`);
+    console.log(`GCsnippet.js - Triggering Auth.signIn automatically (${reason}).`);
 
     try {
-        const commandResult = Genesys("command", "signIn");
+        const commandResult = Genesys("command", "Auth.signIn");
         if (commandResult && typeof commandResult.then === 'function') {
             commandResult
                 .then(() => {
-                    console.log('GCsnippet.js - signIn command dispatched.');
+                    console.log('GCsnippet.js - Auth.signIn command dispatched.');
                     autoSignInInProgress = false;
                 })
                 .catch(error => {
                     handleAutoSignInError(error, reason);
                 });
         } else {
-            console.log('GCsnippet.js - signIn command executed (fire-and-forget). Awaiting Auth events.');
+            console.log('GCsnippet.js - Auth.signIn command executed (fire-and-forget). Awaiting Auth events.');
             autoSignInInProgress = false;
         }
     } catch (error) {
