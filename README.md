@@ -38,7 +38,8 @@ The integration includes the following components:
    - `GC_ENVIRONMENT`: e.g., prod-euc1
    - `GC_MESSAGING_DEPLOYMENT_ID`
    - `GOOGLE_CLOUD_CLIENT_ID`
-   - `GOOGLE_CLOUD_CLIENT_SECRET`
+
+> **Security note:** The Google OAuth client secret must never be exposed in the browser. Keep it stored only within Google Cloud and Genesys Cloud configuration; this application does not read or store it.
 
 ## Genesys Cloud & Google Cloud integration details
 
